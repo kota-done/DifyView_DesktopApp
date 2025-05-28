@@ -1,0 +1,45 @@
+
+#ログファイルが混入してもアップしない。
+*.log
+
+# コンパイルされた class ファイル
+*.class
+
+
+# OSごとの不要ファイル
+.DS_Store
+Thumbs.db
+
+# Eclipse / IntelliJ などのIDE設定ファイル
+*.iml
+.idea/
+*.iws
+*.ipr
+.classpath
+.project
+.settings/
+
+# ビルド出力
+/bin/
+/out/
+/target/
+
+# Gradle / Maven キャッシュ
+.gradle/
+/build/
+!gradle/wrapper/gradle-wrapper.jar
+
+# プロパティファイル（個人設定や認証情報など）
+*.properties
+
+# テスト出力
+/test-output/
+
+# 環境変数定義ファイル（もし使用している場合）
+.env
+.env.*
+
+# JARなど成果物（配布対象でなければ）
+*.jar
+*.war
+*.ear

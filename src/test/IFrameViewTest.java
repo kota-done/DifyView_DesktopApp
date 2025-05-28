@@ -8,6 +8,8 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import app.ViewLauncher;
+
 
 public class IFrameViewTest {
 
@@ -35,10 +37,10 @@ public class IFrameViewTest {
 //			frame.setView("テストウィンドウ", 400,300);
 			
 			//Viewlauncherテスト
-//			ViewLauncher lnc = new ViewLauncher();
-//			lnc.launch();
-//			Thread.sleep(6000);
-			System.out.println(System.getProperty("user.home"));
+			ViewLauncher lnc = new ViewLauncher();
+			lnc.launch();
+			Thread.sleep(6000);
+			
 			
 		} catch (Exception e) {
 			e.printStackTrace();

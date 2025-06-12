@@ -12,7 +12,7 @@ import org.junit.Test;
 /**
  * 
  */
-public class AppSettingDtoTest {
+public class AppSettingFactoryTest {
 
 	/**
 	 * @throws java.lang.Exception

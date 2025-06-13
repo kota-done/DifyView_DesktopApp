@@ -1,6 +1,3 @@
-/**
- * 
- */
 package app.config;
 
 /**
@@ -8,7 +5,7 @@ package app.config;
  * @author 
  * @version 1.0
  */
-class AppSettingFactory {
+public class AppSettingFactory {
 	/*
 	 属性:設定ファイルDto
 	*/

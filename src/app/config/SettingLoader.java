@@ -11,7 +11,7 @@ public class SettingLoader {
 		try (FileInputStream file = new FileInputStream(path)){
 			proList.load(file);
 			
-			AppSettingDto config = new AppSettingDto();
+			
 		
 		} 
 		catch (Exception e) {

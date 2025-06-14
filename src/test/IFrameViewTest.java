@@ -8,8 +8,6 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import app.ViewLauncher;
-
 
 public class IFrameViewTest {
 
@@ -37,13 +35,7 @@ public class IFrameViewTest {
 //			frame.setView("テストウィンドウ", 400,300);
 			
 			//Viewlauncherテスト
-<<<<<<< Updated upstream
-			
-=======
-			ViewLauncher lnc = new ViewLauncher();
-			lnc.launch();
-			Thread.sleep(6000);
->>>>>>> Stashed changes
+
 			
 			
 		} catch (Exception e) {

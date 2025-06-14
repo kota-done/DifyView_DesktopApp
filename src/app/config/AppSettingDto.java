@@ -20,7 +20,13 @@ class AppSettingDto {
 	/************
 	* メソッド名：引数付きコンストラクタ
 	* 処理内容：インスタンス生成用コンストラクタ、同パッケージのAppSettingFactoryのcreateInstace()から呼ぶ。
-	************/
+	 * @param logPass
+	 * @param logFileExtension
+	 * @param title
+	 * @param windUrl
+	 * @param windWidth
+	 * @param windHeight
+	 */
 	AppSettingDto(String logPass,
 			              String logFileExtension,
 			              String title,

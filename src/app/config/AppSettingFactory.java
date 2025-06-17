@@ -21,7 +21,7 @@ public class AppSettingFactory {
 	/************/
 	AppSettingDto getInstance() {
 		if (appSettingDto == null) {
-			throw new IllegalStateException();
+			throw new IllegalStateException("生成処理未実施エラー：インスタンスが存在しません。");
 		}
 		return appSettingDto;
 	}

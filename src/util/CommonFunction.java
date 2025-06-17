@@ -21,9 +21,11 @@ public class CommonFunction {
 		for(int i = 0;i<checkNum; i++) {
 			if(checkStrings[i]==null) {
 				errorMessage.append("項目のうち").append(i).append("番目がnullです\n");
+				continue;
 			}
 			if(checkStrings[i].isBlank()) {
 				errorMessage.append("項目のうち").append(i).append("番目が空白です\n");
+				continue;
 			}
 		}
 		if(errorMessage.length()>0) {

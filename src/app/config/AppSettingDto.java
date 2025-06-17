@@ -1,7 +1,7 @@
 package app.config;
 
 /**
- * 設定ファイルのDtoクラス。
+ * 設定ファイルのDtoクラス
  * @author 
  * @version 1.1
  */

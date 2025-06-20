@@ -1,4 +1,4 @@
-package app.window;
+package app.windowView.window;
 
 public class WindowLauncher {
 	public void launch() {

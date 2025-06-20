@@ -1,7 +1,7 @@
 /**
  * 
  */
-package util;
+package app.util;
 
 /**
  * 共通関数クラス

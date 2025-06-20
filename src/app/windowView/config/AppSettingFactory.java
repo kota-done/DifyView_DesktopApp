@@ -1,6 +1,4 @@
-package app.config;
-
-import util.CommonFunction;
+package app.windowView.config;
 
 /**
  * 設定ファイルDtoのFactoryクラス。
@@ -44,10 +42,6 @@ public class AppSettingFactory {
 			String windUrl,
 			int windWidth,
 			int windHeight) {
-
-		//引数のNULLおよび空白チェック。int型は呼び出し元のLoaderクラスのメソッドでint型と制限しているのでnull混入はコンパイルで弾ける。
-		//例外キャッチは呼び出し元。
-		CommonFunction.checkNullBlank(logPass, logFileExtension, windUrl);
 
 		//引数付きコンストラクタ呼び出し。
 		appSettingDto = new AppSettingDto(logPass, logFileExtension, title, windUrl, windWidth, windHeight);

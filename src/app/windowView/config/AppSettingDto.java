@@ -1,4 +1,4 @@
-package app.config;
+package app.windowView.config;
 
 /**
  * 設定ファイルのDtoクラス

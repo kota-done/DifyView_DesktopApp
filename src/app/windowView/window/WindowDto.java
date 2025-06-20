@@ -1,7 +1,7 @@
 /**
  * 
  */
-package app.window;
+package app.windowView.window;
 
 /**
  * 

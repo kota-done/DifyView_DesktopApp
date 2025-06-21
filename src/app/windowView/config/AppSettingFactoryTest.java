@@ -10,9 +10,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-/**
- * 
- */
+
 public class AppSettingFactoryTest {
 
 	//テストメソッド実行用変数

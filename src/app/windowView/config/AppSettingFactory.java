@@ -5,7 +5,7 @@ package app.windowView.config;
  * @author 
  * @version 1.0
  */
-public class AppSettingFactory {
+class AppSettingFactory {
 	/*
 	 属性:設定ファイルDto
 	*/
@@ -17,7 +17,7 @@ public class AppSettingFactory {
 	* @return AppSettingDto
 	* @throws IllegalStateException すでに生成済みの場合
 	/************/
-	AppSettingDto getInstance() {
+	public AppSettingDto getInstance() {
 		if (appSettingDto == null) {
 			throw new IllegalStateException("生成処理未実施エラー：インスタンスが存在しません。");
 		}
@@ -28,7 +28,7 @@ public class AppSettingFactory {
 	* メソッド名：インスタンス生成メソッド
 	* 処理内容：引数つきコンストラクタを呼び出す。
 	* AppSettingDtoインスタンスを生成
-	* @param logPass
+	* @param logPath
 	* @param logFileExtension
 	* @param title
 	* @param windUrl
@@ -36,7 +36,7 @@ public class AppSettingFactory {
 	* @param windHeight
 	* @return void
 	************/
-	void createInstance(String logPass,
+	void createInstance(String logPath,
 			String logFileExtension,
 			String title,
 			String windUrl,
@@ -44,6 +44,6 @@ public class AppSettingFactory {
 			int windHeight) {
 
 		//引数付きコンストラクタ呼び出し。
-		appSettingDto = new AppSettingDto(logPass, logFileExtension, title, windUrl, windWidth, windHeight);
+		appSettingDto = new AppSettingDto(logPath, logFileExtension, title, windUrl, windWidth, windHeight);
 	}
 }

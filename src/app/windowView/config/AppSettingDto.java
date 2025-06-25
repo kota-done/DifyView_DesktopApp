@@ -5,12 +5,12 @@ package app.windowView.config;
  * @author 
  * @version 1.1
  */
-class AppSettingDto {
+public class AppSettingDto {
 	
 	/*
 	 属性:タイトル、表示URL、ウィンドウ幅、ウィンドウ高さ
 	*/
-	private final String logPass;
+	private final String logPath;
 	private final String logFileExtensionString;
 	private final String title;
 	private final String windUrl;
@@ -27,13 +27,13 @@ class AppSettingDto {
 	 * @param windWidth
 	 * @param windHeight
 	 */
-	AppSettingDto(String logPass,
+	AppSettingDto(String logPath,
 			              String logFileExtension,
 			              String title,
 			              String windUrl,
 			              int windWidth,
 			              int windHeight){
-		this.logPass= logPass;
+		this.logPath= logPath;
 		this.logFileExtensionString = logFileExtension;
 		this.title = title;
 		this.windUrl = windUrl;
@@ -45,8 +45,8 @@ class AppSettingDto {
 	// メソッド名：フィールド変数のGetter
 	// 処理内容：各フィールド変数の中身を取得。
 	/************/
-	public String getLogPass() {
-		return logPass;
+	public String getLogPath() {
+		return logPath;
 	}
 	public String getLogFileExtensionString() {
 		return logFileExtensionString;

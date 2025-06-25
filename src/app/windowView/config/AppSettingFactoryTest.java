@@ -56,14 +56,14 @@ public class AppSettingFactoryTest {
 			test1.createInstance(testlog, testlogFile, testTitle, testwindUrl, testwindWidth, testwindHeight);
 			AppSettingDto testValue = test1.getInstance();
 
-			assertEquals("テスト", testValue.getLogPass());
+			assertEquals("テスト", testValue.getLogPath());
 			assertEquals("テスト", testValue.getLogFileExtensionString());
 			assertEquals("テスト", testValue.getTitle());
 			assertEquals("テスト", testValue.getWindUrl());
 			assertEquals(30, testValue.getWindWidth());
 			assertEquals(30, testValue.getWindHeight());
 
-			out.println("logPass: " + testValue.getLogPass());
+			out.println("logPass: " + testValue.getLogPath());
 			out.println("logFileExtension: " + testValue.getLogFileExtensionString());
 			out.println("title: " + testValue.getTitle());
 			out.println("windUrl: " + testValue.getWindUrl());
@@ -195,14 +195,14 @@ public class AppSettingFactoryTest {
 			out.println(resultOutopu + "が開始されました。");
 			AppSettingDto testValue = test2.getInstance();
 
-			assertEquals("テスト", testValue.getLogPass());
+			assertEquals("テスト", testValue.getLogPath());
 			assertEquals("テスト", testValue.getLogFileExtensionString());
 			assertEquals("テスト", testValue.getTitle());
 			assertEquals("テスト", testValue.getWindUrl());
 			assertEquals(30, testValue.getWindWidth());
 			assertEquals(30, testValue.getWindHeight());
 
-			out.println("logPass: " + testValue.getLogPass());
+			out.println("logPass: " + testValue.getLogPath());
 			out.println("logFileExtension: " + testValue.getLogFileExtensionString());
 			out.println("title: " + testValue.getTitle());
 			out.println("windUrl: " + testValue.getWindUrl());
@@ -242,14 +242,14 @@ public class AppSettingFactoryTest {
 			test3.createInstance(testlog, testlogFile, testTitle, testwindUrl, testwindWidth, testwindHeight);
 			AppSettingDto testValue = test3.getInstance();
 
-			assertEquals("テスト", testValue.getLogPass());
+			assertEquals("テスト", testValue.getLogPath());
 			assertEquals("テスト", testValue.getLogFileExtensionString());
 			assertEquals("テスト", testValue.getTitle());
 			assertEquals("テスト", testValue.getWindUrl());
 			assertEquals(30, testValue.getWindWidth());
 			assertEquals(30, testValue.getWindHeight());
 
-			out.println("logPass: " + testValue.getLogPass());
+			out.println("logPass: " + testValue.getLogPath());
 			out.println("logFileExtension: " + testValue.getLogFileExtensionString());
 			out.println("title: " + testValue.getTitle());
 			out.println("windUrl: " + testValue.getWindUrl());
@@ -272,7 +272,7 @@ public class AppSettingFactoryTest {
 			assertEquals(40, testValue.getWindWidth());
 			assertEquals(40, testValue.getWindHeight());
 
-			out.println("logPass: " + testValue.getLogPass());
+			out.println("logPass: " + testValue.getLogPath());
 			out.println("logFileExtension: " + testValue.getLogFileExtensionString());
 			out.println("title: " + testValue.getTitle());
 			out.println("windUrl: " + testValue.getWindUrl());

@@ -5,6 +5,8 @@ package app.util;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.NetworkInterface;
+import java.util.Enumeration;
 import java.util.Properties;
 
 /**
@@ -55,4 +57,35 @@ public class CommonFunction {
 			return props;
 		}
 	}
+	
+    /**
+     * アプリ起動PCのMacアドレス取得メソッド　動作未検証
+     * @return Macアドレス（例：00-1A-2B-3C-4D-5E/取得できない時はnull）
+     * @throws IOException 読み込み失敗時
+     */
+	public static String getMacAddress() {
+        try {
+            Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
+            while (interfaces.hasMoreElements()) {
+                NetworkInterface ni = interfaces.nextElement();
+                // ループバック、仮想NIC、現在使えないNICは除外
+                if (ni.isLoopback() || ni.isVirtual() || !ni.isUp()) {
+                    continue;
+                }
+
+                byte[] mac = ni.getHardwareAddress();
+                //MACアドレスが存在しないまたは、長さがMACアドレスの6バイト以外は排除。
+                if (mac != null && mac.length == 6) {
+                    StringBuilder sb = new StringBuilder();
+                    for (int i = 0; i < mac.length; i++) {
+                        sb.append(String.format("%02X%s", mac[i], (i < mac.length - 1) ? "-" : ""));
+                    }
+                    return sb.toString();
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace(); // 必要に応じてログ出力
+        }
+        return null;
+    }
 }

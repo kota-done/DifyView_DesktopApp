@@ -35,7 +35,7 @@ public class DifyApiClientTest {
 		
 		//動作検証用API
 		testAPI_URL = "https://api.dify.ai/v1/chat-messages";
-		//API key
+		//API key　7/6破棄済み。
 		testapiKey = "app-U0mzkxjHHMKMHOLUqipN8ScJ";
 		
 		//リクエストDtoの生成

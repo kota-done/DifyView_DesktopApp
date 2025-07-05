@@ -15,6 +15,11 @@ public class DifyResponseDto {
 
 	//チャット履歴追跡Id　未使用
 	private String conversation_id;
+	
+	//チャンクのイベント（終了キャッチ用）
+	private String event;
+
+
 
 	//チャットbotが参照したドキュメントの情報を格納するリスト。
 	private List<RetrieverResourceDto> retriever_resources;
@@ -33,6 +38,9 @@ public class DifyResponseDto {
 
 	public String getConversation_id() {
 		return conversation_id;
+	}
+	public String getEvent() {
+		return event;
 	}
 
 	public List<RetrieverResourceDto> getRetriever_resources() {

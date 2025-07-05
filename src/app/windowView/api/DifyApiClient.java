@@ -13,6 +13,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import okhttp3.ResponseBody;
 import okio.BufferedSource;
 
 public class DifyApiClient {
@@ -44,7 +45,7 @@ public class DifyApiClient {
 				.header("Authorization", "Bearer " + apiKey)
 				.post(body)
 				.build();
-		System.out.println(request);
+		//System.out.println(request);
 		//
 		httpClient.newCall(request).enqueue(new Callback() {
 			//通信失敗時の処理
@@ -60,22 +61,38 @@ public class DifyApiClient {
 				if (!response.isSuccessful()) {
 					throw new IOException("API通信ステータスエラー；" + response.code());
 				}
+				//レスポンスのnullチェック
+				ResponseBody responseBdoy = response.body();
+				if (responseBdoy == null) {
+					throw new IllegalStateException("レスポンスの中身がnullです。");
+				}
 
 				//チャンク毎にレスポンスの受け取り
-				try (BufferedSource source = response.body().source()) {
+				try (BufferedSource source = responseBdoy.source()) {
+
 					while (!source.exhausted()) {
 						//1行ずつUTF-8形式で格納
 						String resline = source.readUtf8LineStrict();
 
-						if (resline.startsWith("data:")) {
-							//受信チャンクが終了文かどうかチェック
+						if (resline != null && resline.startsWith("data:")) {
+
 							String data = resline.substring(6);
-							if ("[DONE]".equals(data)) {
-								onComplete.run();
-								break;
-							}
+							//受信チャンクが終了文かどうかチェック
+							//							if ("[DONE]".equals(data)) {
+							//								onComplete.run();
+							//								break;
+							//							}
 
 							DifyResponseDto chunk = gson.fromJson(data, DifyResponseDto.class);
+							
+							//受信チャンクのイベントをチェックし、終了イベントなら処理終了。
+							String event = chunk.getEvent();
+							//nullでないなら、event.trim()、nullなら空文字を返す。
+							if("message_end".equals(event!= null ? event.trim():"")) {
+								onComplete.run();
+								System.out.println("チャンクの終了を確認");
+								break;
+							}
 							//メソッド引数のonChunkにセットされているメソッドの呼び出し。
 							onChunk.accept(chunk.getAnswer());
 						}

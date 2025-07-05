@@ -1,5 +1,6 @@
 package app.windowView.api;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class DifyRequestDto {
@@ -27,7 +28,7 @@ public class DifyRequestDto {
 		this.query = usrInputs;
 		this.usrMacAddress = null;
 		this.conversation_id = null;
-		this.inputs = null;
+		this.inputs = new HashMap<String, Object>();
 	}
 
 	public String getQuery() {

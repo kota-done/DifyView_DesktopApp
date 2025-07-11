@@ -6,6 +6,7 @@ import java.util.function.Consumer;
 
 import com.google.gson.Gson;
 
+import app.util.CommonFunction;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.MediaType;
@@ -24,14 +25,21 @@ public class DifyApiClient {
 
 	/**
 	*引数付きコンストラクタ
-	* @param 1:apiUrl　API通信するURL  2:apiKey　API通信のキー
+	* @param apiUrl　API通信するURL  
+	* @param apiKey　API通信のキー
 	*/
 	public DifyApiClient(String apiUrl, String apiKey) {
 		this.difyAPI_URL = apiUrl;
 		this.apiKey = apiKey;
 		this.httpClient = new OkHttpClient();
 	}
-
+	
+	/**
+	*DifyAPIとのストリーミング通信処理
+	* @param dto DifyRequestDtoオブジェクト：リクエスト
+	* @param onChunk レスポンス成功時に実行するメソッド
+	* @param conComplete レスポンス受信終了時に実行するメソッド
+	*/
 	public void streamingMsg(DifyRequestDto dto, Consumer<String> onChunk, Runnable onComplete) {
 		//リクエストの中身
 		RequestBody body = RequestBody.create(
@@ -85,10 +93,13 @@ public class DifyApiClient {
 
 							DifyResponseDto chunk = gson.fromJson(data, DifyResponseDto.class);
 							
+							//チャンクの中身の空白チェック,空白なら例外
+							CommonFunction.checkNullBlank(chunk.getAnswer());
+
 							//受信チャンクのイベントをチェックし、終了イベントなら処理終了。
 							String event = chunk.getEvent();
 							//nullでないなら、event.trim()、nullなら空文字を返す。
-							if("message_end".equals(event!= null ? event.trim():"")) {
+							if ("message_end".equals(event != null ? event.trim() : "")) {
 								onComplete.run();
 								System.out.println("チャンクの終了を確認");
 								break;

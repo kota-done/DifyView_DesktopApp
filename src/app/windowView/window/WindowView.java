@@ -13,8 +13,6 @@ import javafx.stage.Stage;
  * @version 1.0
  */
 public class WindowView extends Application {
-	
-	
 	//
 	WebView webView = new WebView();
 

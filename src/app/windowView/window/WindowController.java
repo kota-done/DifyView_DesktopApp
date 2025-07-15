@@ -3,24 +3,25 @@ package app.windowView.window;
 import app.util.CommonFunction;
 import app.windowView.api.DifyApiClient;
 import app.windowView.api.DifyRequestDto;
-import javafx.application.Platform;
-import javafx.scene.web.WebView;
 
 public class WindowController {
 	
-	//表示ウィンドウのWindowViewオブジェクト
-	private final WebView view;
+	//表示ウィンドウのWindowEngineのラッパーオブジェクト
+	private final WebEngineWrapper webEngine;
 	//APIt通信用のインスタンス　APIのURLやキー情報を内包している。
 	private final DifyApiClient apiClient;
+	//UI処理スレッドのラッパーオブジェクト
+	private final UiIniWrapper uiRunnable;
 	
 	/************
 	* メソッド名：引数付きコンストラクタ
 	* 処理内容：ロジッククラスで初期化する際に、現在表示中のウィンドウのオブジェクトを取得する。
 	* @param view　ロジッククラスのフィールドにあるWindowViewオブジェクト
 	/************/
-	public WindowController(WebView view,DifyApiClient apiClient) {
-		this.view = view;
+	public WindowController(WebEngineWrapper webEngine,DifyApiClient apiClient,UiIniWrapper r) {
+		this.webEngine = webEngine;
 		this.apiClient = apiClient;
+		this.uiRunnable = r;
 	}
 	/************
 	* メソッド名：イベントハンドラーメソッド
@@ -35,11 +36,11 @@ public class WindowController {
 		    try {
 		        apiClient.streamingMsg(
 		            dto,
-		            chunk -> Platform.runLater(() -> appendChatChunk(chunk)),
-		            () -> Platform.runLater(this::onChatComplete)
+		            chunk -> uiRunnable.runLater(() -> appendChatChunk(chunk)),
+		            () -> uiRunnable.runLater(this::onChatComplete)
 		        );
 		    } catch (Exception e) {
-		        Platform.runLater(() -> showError(e));
+		    	uiRunnable.runLater(() -> showError(e));
 		    }
 		});
 		communicationThread.setDaemon(true); // アプリ終了と同時に停止するよう設定
@@ -52,7 +53,7 @@ public class WindowController {
 	/************/
 	private void showError(Exception e) {
 		String msg = "エラーが発生しました: " + e.getMessage();
-	    view.getEngine().executeScript("showError('" + CommonFunction.escapeForJS(msg) + "')");
+	    webEngine.call("showError('" + CommonFunction.escapeForJS(msg) + "')");
 	}
 	/************
 	* メソッド名：受信チャンク表示
@@ -60,14 +61,14 @@ public class WindowController {
 	* @param chunk　Difyからのレスポンス
 	/************/
 	private void appendChatChunk(String chunk) {
-		view.getEngine().executeScript("appendMsg("+ CommonFunction.escapeForJS(chunk)+")");
+		webEngine.call("appendMsg("+ CommonFunction.escapeForJS(chunk)+")");
 	}
 	/************
 	* メソッド名：受信完了メッセージ表示
 	* 処理内容：全てのチャンクの受信が完了した旨を表示する処理を呼び出す。
 	/************/
 	private void onChatComplete() {
-		view.getEngine().executeScript("completeMsg()");
+		webEngine.call("completeMsg()");
 	}
 }
 	

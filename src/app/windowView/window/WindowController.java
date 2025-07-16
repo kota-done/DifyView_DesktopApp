@@ -53,7 +53,7 @@ public class WindowController {
 	/************/
 	private void showError(Exception e) {
 		String msg = "エラーが発生しました: " + e.getMessage();
-	    webEngine.call("showError('" + CommonFunction.escapeForJS(msg) + "')");
+	    webEngine.call("showError(" + CommonFunction.escapeForJS(msg) + ")");
 	}
 	/************
 	* メソッド名：受信チャンク表示

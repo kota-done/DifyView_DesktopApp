@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>チャットUI</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      width: 100vw;
+      display: flex;
+      flex-direction: column;
+    }
+
+    #chat-area {
+      flex: 1;
+      padding: 10px;
+      overflow-y: auto;
+      background: #f0f0f0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .chat-wrapper {
+      display: flex;
+      margin: 5px 0;
+    }
+
+    .chat-wrapper.user {
+      justify-content: flex-end;
+    }
+
+    .chat-wrapper.bot {
+      justify-content: flex-start;
+    }
+
+    .message {
+      display: inline-block;
+      max-width: 75%;
+      background: #eee;
+      padding: 8px 12px;
+      border-radius: 10px;
+      word-break: break-word;
+      white-space: pre-wrap;
+    }
+
+    .message.user {
+      background: #cce5ff;
+      text-align: right;
+    }
+
+    .message.bot {
+      background: #d4edda;
+      text-align: left;
+    }
+
+    #input-area {
+      display: flex;
+      padding: 10px;
+      background: #ddd;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    #user-input {
+      flex: 1;
+      padding: 8px;
+      font-size: 1em;
+      resize: none;
+      min-height: 2em;
+      max-height: 8em;
+      overflow-y: auto;
+      box-sizing: border-box;
+      white-space: pre-wrap;
+      word-break: break-word;
+      width: 100%;
+      max-width: 100%;
+    }
+
+    #input-area button {
+      padding: 8px 16px;
+      font-size: 1em;
+      margin-left: 5px;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="chat-area">
+    <div class="chat-wrapper bot">
+      <div class="message bot">こんにちは！ご用件をどうぞ。</div>
+    </div>
+  </div>
+  <div id="input-area">
+    <textarea id="user-input" placeholder="メッセージを入力..."></textarea>
+    <button onclick="sendMessage()">送信</button>
+  </div>
+  <script>
+    const input = document.getElementById("user-input");
+    const chatArea = document.getElementById("chat-area");
+
+    input.addEventListener("input", () => {
+      input.style.height = "auto";
+      input.style.height = input.scrollHeight + "px";
+    });
+
+    // メッセージ送信処理
+    function sendMessage() {
+      //入力メッセージチェック
+      const message = input.value.trim();
+      if (!message) return;
+
+      // --- ユーザーメッセージの表示 ---
+      const userWrapper = document.createElement("div");
+      userWrapper.className = "chat-wrapper user";
+      const userMsg = document.createElement("div");
+      userMsg.className = "message user";
+      userMsg.textContent = message;
+      userWrapper.appendChild(userMsg);
+      chatArea.appendChild(userWrapper);
+
+
+      // --- Botの応答メッセージの表示 ---
+      const botWrapper = document.createElement("div");
+      botWrapper.className = "chat-wrapper bot";
+      const botMsg = document.createElement("div");
+      botMsg.className = "message bot";
+      chatArea.appendChild(botWrapper);
+      chatArea.scrollTop = chatArea.scrollHeight;
+
+      // --- Java の Bridge クラスへメッセージを渡す ---
+      // Java側でブリッジ登録されているか、onUserInputメソッドが存在するかをチェック。
+      if (window.JavaBridge && typeof window.JavaBridge.onUserInput === "function") {
+        try {
+          window.JavaBridge.onUserInput(message);
+        } catch (e) {
+         showError("メッセージ送信中にエラーが発生しました。"+ e.message);
+          console.error("Error in onUserInput:", e); 
+        }
+      }else {
+        showError("JavaBridgeが正しく設定されていません。");
+      }
+      input.value = "";
+      input.style.height = "auto";
+      chatArea.scrollTop = chatArea.scrollHeight;
+    }
+    // Java側からチャンク追記される
+    function appendMsg(chunk) {
+      const botMsgs = chatArea.querySelectorAll(".chat-wrapper.bot .message.bot");
+      const lastBotMsg = botMsgs[botMsgs.length - 1];
+      if (lastBotMsg && !lastBotMsg.classList.contains("complete")) {
+        lastBotMsg.textContent += chunk;
+      }
+    }
+
+    // チャット完了処理：完了マーク追記＋固定化
+    function completeMsg() {
+      const botMsgs = chatArea.querySelectorAll(".chat-wrapper.bot .message.bot");
+      const lastBotMsg = botMsgs[botMsgs.length - 1];
+      if (lastBotMsg && !lastBotMsg.classList.contains("complete")) {
+        lastBotMsg.textContent += "\n\n--- 応答完了 ---";
+        lastBotMsg.classList.add("complete");
+      }
+      chatArea.scrollTop = chatArea.scrollHeight;
+    }
+
+    // エラー表示処理
+    function showError(msg) {
+      const botWrapper = document.createElement("div");
+      botWrapper.className = "chat-wrapper bot";
+      const botMsg = document.createElement("div");
+      botMsg.className = "message bot complete";
+      botMsg.textContent = msg;
+      botWrapper.appendChild(botMsg);
+      chatArea.appendChild(botWrapper);
+      chatArea.scrollTop = chatArea.scrollHeight;
+    }
+  </script>
+</body>
+
+</html>

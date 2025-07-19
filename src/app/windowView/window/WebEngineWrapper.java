@@ -1,7 +1,6 @@
 package app.windowView.window;
 
 import javafx.scene.web.WebEngine;
-import netscape.javascript.JSObject;
 import window_interface.JsCall;
 
 public class WebEngineWrapper implements JsCall{
@@ -19,16 +18,6 @@ public class WebEngineWrapper implements JsCall{
 	@Override
 	public void call(String js) {
 		webEngine.executeScript(js);
-	}
-	/************
-	* メソッド名：オブジェクトセットメソッド
-	* 処理内容：ブリッジクラスのオブジェクトをJSobjectにセットするメソッド
-	* @param name JSでの呼び出し用の名前
-	* @param bridgeObject セットするクラスのオブジェクト
-	/************/
-	public void registerBridge(String name, Object bridgeObject) {
-	    JSObject window = (JSObject) webEngine.executeScript("window");
-	    window.setMember(name, bridgeObject);
 	}
 	
 	public WebEngine getEngine() {

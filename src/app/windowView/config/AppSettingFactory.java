@@ -1,11 +1,9 @@
 package app.windowView.config;
 
 /**
- * 設定ファイルのDtoクラス
+ * 設定ファイルDtoのFactoryクラス。
  * @author 
- * @version 1.1
- * 修正：
- * 7/19　windURL→apiURLに修正 apiKey追加
+ * @version 1.0
  */
 class AppSettingFactory {
 	/*
@@ -41,12 +39,11 @@ class AppSettingFactory {
 	void createInstance(String logPath,
 			String logFileExtension,
 			String title,
-			String apiUrl,
-			String apiKey,
+			String windUrl,
 			int windWidth,
 			int windHeight) {
 
 		//引数付きコンストラクタ呼び出し。
-		appSettingDto = new AppSettingDto(logPath, logFileExtension, title, apiUrl,apiKey, windWidth, windHeight);
+		appSettingDto = new AppSettingDto(logPath, logFileExtension, title, windUrl, windWidth, windHeight);
 	}
 }

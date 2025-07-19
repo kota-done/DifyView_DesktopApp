@@ -4,8 +4,6 @@ package app.windowView.config;
  * 設定ファイルのDtoクラス
  * @author 
  * @version 1.1
- * 修正：
- * 7/19　windURL→apiURLに修正
  */
 public class AppSettingDto {
 	
@@ -15,8 +13,7 @@ public class AppSettingDto {
 	private final String logPath;
 	private final String logFileExtensionString;
 	private final String title;
-	private final String apiUrl;
-	private final String apiKey;
+	private final String windUrl;
 	private final int windWidth;
 	private final int windHeight;
 
@@ -26,28 +23,24 @@ public class AppSettingDto {
 	 * @param logPass
 	 * @param logFileExtension
 	 * @param title
-	 * @param apidUrl
+	 * @param windUrl
 	 * @param windWidth
 	 * @param windHeight
 	 */
 	AppSettingDto(String logPath,
 			              String logFileExtension,
 			              String title,
-			              String apiUrl,
-			              String apiKey,
+			              String windUrl,
 			              int windWidth,
 			              int windHeight){
 		this.logPath= logPath;
 		this.logFileExtensionString = logFileExtension;
 		this.title = title;
-		this.apiUrl = apiUrl;
-		this.apiKey = apiKey;
+		this.windUrl = windUrl;
 		this.windWidth = windWidth;
 		this.windHeight = windHeight;
 	}
 	
-
-
 	//************
 	// メソッド名：フィールド変数のGetter
 	// 処理内容：各フィールド変数の中身を取得。
@@ -58,11 +51,8 @@ public class AppSettingDto {
 	public String getLogFileExtensionString() {
 		return logFileExtensionString;
 	}
-	public String getApiUrl() {
-		return apiUrl;
-	}
-	public String getApiKey() {
-		return apiKey;
+	public String getWindUrl() {
+		return windUrl;
 	}
 	public int getWindWidth() {
 		return windWidth;

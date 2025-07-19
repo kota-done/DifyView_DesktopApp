@@ -4,13 +4,6 @@ import java.util.Properties;
 
 import app.util.CommonFunction;
 
-/**
- * 設定ファイルのDtoクラス
- * @author 
- * @version 1.1
- * 修正：
- * 7/19　windURL→apiURLに修正 apiKey追加
- */
 public class SettingLoader {
 
 	/**
@@ -31,8 +24,7 @@ public class SettingLoader {
 		String logPath = props.getProperty("LOGPATH").trim();
 		String logFileExtension = props.getProperty("LOGFILEEX").trim();
 		String title = props.getProperty("WINDOW_TITLE").trim();
-		String apiUrl = props.getProperty("API_URL").trim();
-		String apiKey = props.getProperty("API_KEY").trim();
+		String windUrl = props.getProperty("WINDOW_URL").trim();
 		
 		//int型の引数の整数チェック。整数以外はNG。設定値が取得できなかった場合も例外。
 		try {
@@ -46,9 +38,9 @@ public class SettingLoader {
 
 		//引数のNULLおよび空白チェック。int型は呼び出し元のLoaderクラスのメソッドでint型と制限しているのでnull混入はコンパイルで弾ける。
 		//例外キャッチは呼び出し元。
-		CommonFunction.checkNullBlank(logPath, logFileExtension, title, apiUrl,apiKey);
+		CommonFunction.checkNullBlank(logPath, logFileExtension, title, windUrl);
 
-		fact.createInstance(logPath, logFileExtension, title, apiUrl,apiKey, windWidth, windHeight);
+		fact.createInstance(logPath, logFileExtension, title, windUrl, windWidth, windHeight);
 		return fact.getInstance();
 	}
 }

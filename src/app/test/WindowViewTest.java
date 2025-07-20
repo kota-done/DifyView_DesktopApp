@@ -17,12 +17,12 @@ public class WindowViewTest {
 			out.println(resultOutput + "が開始されました。");
 			
 			String testTitle = "テスト";
-			String testUrl = "https://google.com";
+//			String testUrl = "https://google.com";
 			String testWidth = "800";
 			String testHeight = "600";
 			
 			//ウィンドウ表示実行。
-			Application.launch(WindowView.class,testTitle,testUrl,testWidth,testHeight);
+			Application.launch(WindowView.class,testTitle,testWidth,testHeight);
 			
 			out.println(resultOutput + "が正常終了しました。");
 

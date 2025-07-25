@@ -4,6 +4,7 @@ import java.net.URL;
 import java.util.List;
 
 import javafx.application.Application;
+import javafx.concurrent.Worker;
 import javafx.scene.Scene;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
@@ -87,7 +88,21 @@ public class WindowView extends Application {
 		//HTMLファイルのパス取得
 		String htmlPath = "/resources/window/window_chatBot.html";
 		URL url = getClass().getResource(htmlPath);
-		System.out.println("取得URL："+url);
+		//		System.out.println("取得URL："+url);
+
+		//WebEngineの初期化ロードのチェック。ロードが完了してから、ロジッククラスのブリッジセット処理を呼び出す。
+		webView.getEngine().getLoadWorker().stateProperty().addListener((obs, oldState, newState) -> {
+			if (newState == Worker.State.SUCCEEDED) {
+				//ロジッククラスからコールバック用のオブジェクトがセットされているかチェック。
+				if (staticCallback != null) {
+					//セットされていれば、ロジッククラスにWindoViewオブジェクトを渡してブリッジセットメソッド起動。
+					staticCallback.onWindowSet(this);
+				} else {
+					throw new IllegalStateException("BridgeCallbackがセットされていません。");
+				}
+			}
+		});
+
 		if (url == null) {
 			throw new IllegalStateException("HTMLファイルが見つかりません" + htmlPath);
 		} else {
@@ -99,13 +114,6 @@ public class WindowView extends Application {
 			stage.setScene(scene);
 			stage.show();
 
-			//ロジッククラスからコールバック用のオブジェクトがセットされているかチェック。
-			if (staticCallback != null) {
-				//セットされていれば、ロジッククラスにWindoViewオブジェクトを渡してブリッジセットメソッド起動。
-				staticCallback.onWindowSet(this);
-			} else {
-				throw new IllegalStateException("BridgeCallbackがセットされていません。");
-			}
 		}
 	}
 }

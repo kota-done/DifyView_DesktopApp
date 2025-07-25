@@ -56,10 +56,20 @@ public class WindowLogic {
 				public void onWindowSet(WindowView view) {
 					windowview = view;
 					webview = windowview.getView();
+
 					// JS Bridge登録
 					JavaBridge bridge = new JavaBridge(this);
-					JSObject js = (JSObject) webview.getEngine().executeScript("window");
-					js.setMember("JavaBridge", bridge);
+					// DOMとJSのロードが完了したタイミングでBridge登録とJS呼び出し
+					try {
+						JSObject js = (JSObject) webview.getEngine().executeScript("window");
+						System.out.println("ブリッジ設定メソッド起動");
+						js.setMember("JavaBridge", bridge);
+						// JavaScriptの初期化関数を呼び出す（この時点でJavaBridgeは登録済）
+						js.eval("initChat()");
+					} catch (Exception e) {
+						System.out.println("なんかのエラー：" + e);
+					}
+
 					//初期化したUIオブジェクトからラッパーオブジェクトの初期化
 					wrapper = new WebEngineWrapper(webview.getEngine());
 					//コントローラークラスの初期化
@@ -83,11 +93,12 @@ public class WindowLogic {
 			String setHeight = String.valueOf(configDto.getWindHeight());
 
 			//ウィンドウ初期化処理呼び出し　引数；1、WindowView（Application実装クラス）2〜、ウィンドウ設定値
-			Application.launch(WindowView.class,setTitle, setWidth, setHeight);
+			Application.launch(WindowView.class, setTitle, setWidth, setHeight);
 
 		} catch (Exception e) {
-			// TODO: handle exception
+			throw new IllegalStateException("ロジック内で例外発生：" + e);
 		}
 		//ウィンドウの初期化処理の呼び出し：WindowView　引数：設定ファイルDto
 	}
+
 }

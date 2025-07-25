@@ -99,7 +99,8 @@
     <textarea id="user-input" placeholder="メッセージを入力..."></textarea>
     <button onclick="sendMessage()">送信</button>
   </div>
-  <script>
+
+    <script>
     const input = document.getElementById("user-input");
     const chatArea = document.getElementById("chat-area");
 
@@ -133,8 +134,8 @@
       chatArea.scrollTop = chatArea.scrollHeight;
 
       // --- Java の Bridge クラスへメッセージを渡す ---
-      // Java側でブリッジ登録されているか、onUserInputメソッドが存在するかをチェック。
-      if (window.JavaBridge && typeof window.JavaBridge.onUserInput === "function") {
+      // Java側でブリッジ登録されているか、sendToJavaメソッドが存在するかをチェック。
+      if (window.JavaBridge && typeof window.JavaBridge.sendToJava === "function") {
         try {
           window.JavaBridge.onUserInput(message);
         } catch (e) {
@@ -148,21 +149,37 @@
       input.style.height = "auto";
       chatArea.scrollTop = chatArea.scrollHeight;
     }
-    // Java側からチャンク追記される
+
+
+    // Java側からチャンク追記される　最初は新しいメッセージとして追記
     function appendMsg(chunk) {
-      const botMsgs = chatArea.querySelectorAll(".chat-wrapper.bot .message.bot");
-      const lastBotMsg = botMsgs[botMsgs.length - 1];
-      if (lastBotMsg && !lastBotMsg.classList.contains("complete")) {
-        lastBotMsg.textContent += chunk;
-      }
-    }
+  let botMsgs = chatArea.querySelectorAll(".chat-wrapper.bot .message.bot");
+  let lastBotMsg = botMsgs[botMsgs.length - 1];
+
+  // メッセージ欄が存在しない or complete なら新規作成
+  if (!lastBotMsg || lastBotMsg.classList.contains("complete")) {
+    const botWrapper = document.createElement("div");
+    botWrapper.className = "chat-wrapper bot";
+
+    lastBotMsg = document.createElement("div");
+    lastBotMsg.className = "message bot";
+    lastBotMsg.textContent = chunk;
+
+    botWrapper.appendChild(lastBotMsg);
+    chatArea.appendChild(botWrapper);
+  } else {
+    lastBotMsg.textContent += chunk;
+  }
+
+  chatArea.scrollTop = chatArea.scrollHeight;
+}
 
     // チャット完了処理：完了マーク追記＋固定化
     function completeMsg() {
       const botMsgs = chatArea.querySelectorAll(".chat-wrapper.bot .message.bot");
       const lastBotMsg = botMsgs[botMsgs.length - 1];
       if (lastBotMsg && !lastBotMsg.classList.contains("complete")) {
-        lastBotMsg.textContent += "\n\n--- 応答完了 ---";
+        lastBotMsg.textContent += "\n\n--- 質問が可能です。 ---";
         lastBotMsg.classList.add("complete");
       }
       chatArea.scrollTop = chatArea.scrollHeight;
@@ -179,6 +196,15 @@
       chatArea.appendChild(botWrapper);
       chatArea.scrollTop = chatArea.scrollHeight;
     }
+
+    function initChat() {
+  if (window.JavaBridge && typeof window.JavaBridge.sendToJava === "function") {
+    // 例えば初回の案内メッセージを表示するなど
+    completeMsg();
+  } else {
+    showError("JavaBridgeが正しく設定されていません。");
+  }
+}
   </script>
 </body>
 

@@ -72,8 +72,6 @@ public class WindowView extends Application {
 			throw new IllegalStateException("引数に必要な項目がありません。");
 		}
 		String title = laParams.get(0);
-		//		String difyUrl = laParams.get(1);
-		//		String title = dto.getTitle();
 		int width, height;
 
 		//整数に格納

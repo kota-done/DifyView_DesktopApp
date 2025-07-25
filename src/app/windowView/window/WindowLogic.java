@@ -62,7 +62,7 @@ public class WindowLogic {
 					// DOMとJSのロードが完了したタイミングでBridge登録とJS呼び出し
 					try {
 						JSObject js = (JSObject) webview.getEngine().executeScript("window");
-						System.out.println("ブリッジ設定メソッド起動");
+//						System.out.println("ブリッジ設定メソッド起動");
 						js.setMember("JavaBridge", bridge);
 						// JavaScriptの初期化関数を呼び出す（この時点でJavaBridgeは登録済）
 						js.eval("initChat()");

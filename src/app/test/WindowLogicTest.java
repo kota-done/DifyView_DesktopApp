@@ -11,6 +11,5 @@ public class WindowLogicTest {
 		} catch (Exception e) {
 			throw  new IllegalStateException("何かしらの例外発生："+e);
 		}
-		
 	}
 }

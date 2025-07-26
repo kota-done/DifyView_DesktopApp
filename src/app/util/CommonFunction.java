@@ -95,14 +95,14 @@ public class CommonFunction {
 	 * @return input エスケープ処理済み
 	 */
 	public static String escapeForJS(String input) {
-		if (input == null)
-			return "";
-		return input
-				.replace("\\", "\\\\")
-				.replace("'", "\\'")
-				.replace("\"", "\\\"")
-				.replace("\r", "\\r")
-				.replace("\n", "\\n")
-				.replace("\t", "\\t");
+	    if (input == null) return "\"\"";
+	    String escaped = input
+	        .replace("\\", "\\\\")
+	        .replace("\"", "\\\"")
+	        .replace("\n", "\\n")
+	        .replace("\r", "")
+	        .replace("'", "\\'")
+	        .replace("\t", "\\t");
+	    return "\"" + escaped + "\"";  // JS文字列として囲う
 	}
 }

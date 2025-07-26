@@ -8,29 +8,31 @@ import app.windowView.config.AppSettingDto;
 import app.windowView.config.SettingLoader;
 import javafx.application.Application;
 import javafx.scene.web.WebView;
-import netscape.javascript.JSObject;
 import window_interface.BridgeCallback;
 
 public class WindowLogic {
 	//
 	private final static String PROPS_PATH = "/resources/app.properties";
 
-	//
+	//プロパティオブジェクト
 	private Properties props = null;
-	//
+	//設定ファイルDtoのオブジェクト
 	private AppSettingDto configDto = null;
-	//
+	//ウィンドウの画面表示クラスのオブジェクト
 	private WindowView windowview = null;
-	//
+	//ウィンドウの情報を保持するオブジェクト
 	private WebView webview = null;
-	//
-	private WindowController windowController = null;
-	//
+	//画面機能のクラスのオブジェクト　メソッド呼び出し用
+	private WindowController windowController;
+	//API通信クラスのオブジェクト　メソッド呼び出し用
 	private DifyApiClient apiClient;
 	// WebViewエンジンのラッパー（onWindowSet内で初期化）
 	private WebEngineWrapper wrapper;
 	//
 	private UiIniWrapper uiRunnable = new UiIniWrapper();
+
+	//ブリッジクラスのオブジェクト　ロジックで保持する用
+	private JavaBridge bridge;
 
 	/**
 	 * ウィンドウ表示を制御する実行メソッド
@@ -58,20 +60,22 @@ public class WindowLogic {
 					webview = windowview.getView();
 
 					// JS Bridge登録
-					JavaBridge bridge = new JavaBridge(this);
+					bridge = new JavaBridge(this);
 					// DOMとJSのロードが完了したタイミングでBridge登録とJS呼び出し
 					try {
-						JSObject js = (JSObject) webview.getEngine().executeScript("window");
-//						System.out.println("ブリッジ設定メソッド起動");
-						js.setMember("JavaBridge", bridge);
+						//初期化したUIオブジェクトからラッパーオブジェクトの初期化
+						wrapper = new WebEngineWrapper(webview.getEngine());
+						//JSObject js = (JSObject) webview.getEngine().executeScript("window");
+						//						System.out.println("ブリッジ設定メソッド起動");
+						//js.setMember("JavaBridge", bridge);
 						// JavaScriptの初期化関数を呼び出す（この時点でJavaBridgeは登録済）
-						js.eval("initChat()");
+						//js.eval("initChat()");
+						wrapper.registerBridge("JavaBridge", bridge);
+						wrapper.call("initChat()");
 					} catch (Exception e) {
 						System.out.println("なんかのエラー：" + e);
 					}
 
-					//初期化したUIオブジェクトからラッパーオブジェクトの初期化
-					wrapper = new WebEngineWrapper(webview.getEngine());
 					//コントローラークラスの初期化
 					windowController = new WindowController(wrapper, apiClient, uiRunnable);
 				}
@@ -98,7 +102,5 @@ public class WindowLogic {
 		} catch (Exception e) {
 			throw new IllegalStateException("ロジック内で例外発生：" + e);
 		}
-		//ウィンドウの初期化処理の呼び出し：WindowView　引数：設定ファイルDto
 	}
-
 }

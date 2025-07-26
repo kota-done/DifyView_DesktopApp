@@ -111,6 +111,7 @@
 
     // メッセージ送信処理
     function sendMessage() {
+	 //appendMsg("sendMessageを呼び出しました。");
       //入力メッセージチェック
       const message = input.value.trim();
       if (!message) return;
@@ -126,18 +127,19 @@
 
 
       // --- Botの応答メッセージの表示 ---
-      const botWrapper = document.createElement("div");
-      botWrapper.className = "chat-wrapper bot";
-      const botMsg = document.createElement("div");
-      botMsg.className = "message bot";
-      chatArea.appendChild(botWrapper);
-      chatArea.scrollTop = chatArea.scrollHeight;
+      //const botWrapper = document.createElement("div");
+      //botWrapper.className = "chat-wrapper bot";
+      //const botMsg = document.createElement("div");
+      //botMsg.className = "message bot";
+      //chatArea.appendChild(botWrapper);
+      //chatArea.scrollTop = chatArea.scrollHeight;
 
       // --- Java の Bridge クラスへメッセージを渡す ---
       // Java側でブリッジ登録されているか、sendToJavaメソッドが存在するかをチェック。
       if (window.JavaBridge && typeof window.JavaBridge.sendToJava === "function") {
         try {
-          window.JavaBridge.onUserInput(message);
+		  //appendMsg("ブリッジクラスのsendToJavaを呼び出し処理実行。");
+          window.JavaBridge.sendToJava(message);
         } catch (e) {
          showError("メッセージ送信中にエラーが発生しました。"+ e.message);
           console.error("Error in onUserInput:", e); 
@@ -152,7 +154,8 @@
 
 
     // Java側からチャンク追記される　最初は新しいメッセージとして追記
-    function appendMsg(chunk) {
+  window.appendMsg=function(chunk) {
+
   let botMsgs = chatArea.querySelectorAll(".chat-wrapper.bot .message.bot");
   let lastBotMsg = botMsgs[botMsgs.length - 1];
 
@@ -200,6 +203,7 @@
     function initChat() {
   if (window.JavaBridge && typeof window.JavaBridge.sendToJava === "function") {
     // 例えば初回の案内メッセージを表示するなど
+	//appendMsg(typeof appendMsg);
     completeMsg();
   } else {
     showError("JavaBridgeが正しく設定されていません。");

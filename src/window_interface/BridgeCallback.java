@@ -7,7 +7,6 @@ import app.windowView.window.WindowView;
  * 
  */
 public interface BridgeCallback {
-
 	
 	/**
 	 * WindowViewオブジェクトの受け渡し

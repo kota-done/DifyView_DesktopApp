@@ -17,6 +17,13 @@ import okhttp3.Response;
 import okhttp3.ResponseBody;
 import okio.BufferedSource;
 
+/**
+ * API通信処理実装クラス
+ * @author 
+ * @version 1.1
+ * 修正：
+ * 7/26　最終チャンク前に空文字のチャンクが混入する仕様になっていたため、チェック処理追加。
+ */
 public class DifyApiClient {
 	private final String difyAPI_URL;
 	private final String apiKey;
@@ -33,7 +40,7 @@ public class DifyApiClient {
 		this.apiKey = apiKey;
 		this.httpClient = new OkHttpClient();
 	}
-	
+
 	/**
 	*DifyAPIとのストリーミング通信処理
 	* @param dto DifyRequestDtoオブジェクト：リクエスト
@@ -85,17 +92,14 @@ public class DifyApiClient {
 						if (resline != null && resline.startsWith("data:")) {
 
 							String data = resline.substring(6);
-							//受信チャンクが終了文かどうかチェック
-							//							if ("[DONE]".equals(data)) {
-							//								onComplete.run();
-							//								break;
-							//							}
 
 							DifyResponseDto chunk = gson.fromJson(data, DifyResponseDto.class);
-							
-							//チャンクの中身の空白チェック,空白なら例外
-							CommonFunction.checkNullBlank(chunk.getAnswer());
-
+							//チャンクのawnser取り出し
+							String answer = chunk.getAnswer();
+							//空文字の場合（message_endの一つ手前）、スキップ。 7/26動作確認時点で受信チャンクに混入していたため追加。
+							if (answer != null && answer.trim().isEmpty()) {
+								continue;
+							}
 							//受信チャンクのイベントをチェックし、終了イベントなら処理終了。
 							String event = chunk.getEvent();
 							//nullでないなら、event.trim()、nullなら空文字を返す。
@@ -104,8 +108,10 @@ public class DifyApiClient {
 								System.out.println("チャンクの終了を確認");
 								break;
 							}
+							//チャンクの中身の空白チェック,空白なら例外
+							CommonFunction.checkNullBlank(answer);
 							//メソッド引数のonChunkにセットされているメソッドの呼び出し。
-							onChunk.accept(chunk.getAnswer());
+							onChunk.accept(answer);
 						}
 					}
 				} catch (Exception e2) {
@@ -113,9 +119,7 @@ public class DifyApiClient {
 					throw new IllegalStateException("チャンク読み込みエラー：" + e2.getMessage());
 				}
 			}
-
 		});
-
 	}
 
 }

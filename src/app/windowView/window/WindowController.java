@@ -29,6 +29,7 @@ public class WindowController {
 	* @param msg ユーザー入力メッセージ
 	/************/
 	public void onSendMessage(String msg) {
+		
 		//リクエストDto生成
 		DifyRequestDto dto = new DifyRequestDto(msg);
 		//API通信用のスレッド作成。通信終了後に破棄。
@@ -68,6 +69,7 @@ public class WindowController {
 	* 処理内容：全てのチャンクの受信が完了した旨を表示する処理を呼び出す。
 	/************/
 	private void onChatComplete() {
+		//System.out.println("最終チャンクを認識し、JS呼び出しは可能。");
 		webEngine.call("completeMsg()");
 	}
 }

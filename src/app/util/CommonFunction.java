@@ -97,12 +97,12 @@ public class CommonFunction {
 	public static String escapeForJS(String input) {
 	    if (input == null) return "\"\"";
 	    String escaped = input
-	        .replace("\\", "\\\\")
-	        .replace("\"", "\\\"")
-	        .replace("\n", "\\n")
-	        .replace("\r", "")
-	        .replace("'", "\\'")
-	        .replace("\t", "\\t");
+	        .replace("\\", "\\\\") //バックスラッシュ2つ
+	        .replace("\"", "\\\"") //バックスラッシュ1つ
+	        .replace("\n", "\\n") //改行\n
+	        .replace("\r", "\\r") //改行CR
+	        .replace("'", "\\'") //シングルクォーテーション
+	        .replace("\t", "\\t"); //タブ
 	    return "\"" + escaped + "\"";  // JS文字列として囲う
 	}
 }

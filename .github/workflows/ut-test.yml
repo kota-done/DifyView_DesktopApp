@@ -1,4 +1,4 @@
-name: CI Test (Pure Java, JDK 21)
+name: CI Test (Pure Java, JDK 21 with Maven deps)
 
 on:
   push:
@@ -19,31 +19,32 @@ jobs:
           distribution: temurin
           java-version: 21
 
-      # JUnit5（Console Standalone）を取得
-      - name: Download JUnit Platform Console Standalone
+      # Maven 依存関係の取得とクラスパス出力
+      - name: Build Maven classpath file
         run: |
-          mkdir -p lib
-          curl -L -o lib/junit-platform-console-standalone.jar \
-            https://repo1.maven.org/maven2/org/junit/platform/junit-platform-console-standalone/1.10.2/junit-platform-console-standalone-1.10.2.jar
+          mvn -B -q dependency:build-classpath \
+            -DincludeScope=test \
+            -Dmdep.outputFile=cp.txt
 
-      # コンパイル（src と test を想定）testフォルダはsrcと分けた方が良いかも。
+      # ソース & テストのコンパイル（Maven依存をクラスパスに追加）
       - name: Compile sources and tests
         run: |
           mkdir -p out
-          SRC_FILES=$(find src -name "*.java")
+          SRC_FILES=$(find src/app -name "*.java")
           TEST_FILES=$(find src/app/test -name "*.java" || true)
-          javac -cp "lib/junit-platform-console-standalone.jar" -d out $SRC_FILES $TEST_FILES
+          javac -encoding UTF-8 \
+            -cp "$(cat cp.txt)" \
+            -d out \
+            $SRC_FILES $TEST_FILES
 
-      # テスト実行（クラスパス走査）※Junitのソースのみ。JavaFXなどは対象外。
+      # テスト実行（JUnit4対応）
       - name: Run unit tests
         run: |
-          java -jar lib/junit-platform-console-standalone.jar \
-            -cp out \
-            --scan-classpath \
-            --disable-banner \
-            --reports-dir build/test-results
+          java -cp "out:$(cat cp.txt)" \
+            org.junit.runner.JUnitCore $(find src/app/test -name "*Test.java" \
+              | sed 's|src/app/test/||; s|/|.|g; s|\.java$||')
 
-      # レポートを保存（失敗時も保存）
+      # レポート保存
       - name: Upload test reports
         if: always()
         uses: actions/upload-artifact@v4

@@ -103,6 +103,8 @@
     <script>
     const input = document.getElementById("user-input");
     const chatArea = document.getElementById("chat-area");
+    //送信ボタン宣言
+    const sendButton = document.querySelector("#input-area button");
 
     input.addEventListener("input", () => {
       input.style.height = "auto";
@@ -115,6 +117,9 @@
       //入力メッセージチェック
       const message = input.value.trim();
       if (!message) return;
+      //ボタン非活性化
+      sendButton.disabled = true;
+  
 
       // --- ユーザーメッセージの表示 ---
       const userWrapper = document.createElement("div");
@@ -126,16 +131,6 @@
       chatArea.appendChild(userWrapper);
 
 
-      // --- Botの応答メッセージの表示 ---
-      //const botWrapper = document.createElement("div");
-      //botWrapper.className = "chat-wrapper bot";
-      //const botMsg = document.createElement("div");
-      //botMsg.className = "message bot";
-      //chatArea.appendChild(botWrapper);
-      //chatArea.scrollTop = chatArea.scrollHeight;
-
-      // --- Java の Bridge クラスへメッセージを渡す ---
-      // Java側でブリッジ登録されているか、sendToJavaメソッドが存在するかをチェック。
       if (window.JavaBridge && typeof window.JavaBridge.sendToJava === "function") {
         try {
 		  //appendMsg("ブリッジクラスのsendToJavaを呼び出し処理実行。");
@@ -186,6 +181,8 @@
         lastBotMsg.classList.add("complete");
       }
       chatArea.scrollTop = chatArea.scrollHeight;
+      // ボタン活性化
+      sendButton.disabled = false;
     }
 
     // エラー表示処理

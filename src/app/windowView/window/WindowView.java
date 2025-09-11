@@ -86,7 +86,7 @@ public class WindowView extends Application {
 		//HTMLファイルのパス取得
 		String htmlPath = "/resources/window/window_chatBot.html";
 		URL url = getClass().getResource(htmlPath);
-		//		System.out.println("取得URL："+url);
+//				System.out.println("取得URL："+url);
 
 		//WebEngineの初期化ロードのチェック。ロードが完了してから、ロジッククラスのブリッジセット処理を呼び出す。
 		webView.getEngine().getLoadWorker().stateProperty().addListener((obs, oldState, newState) -> {

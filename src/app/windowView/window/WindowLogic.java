@@ -73,7 +73,7 @@ public class WindowLogic {
 						wrapper.registerBridge("JavaBridge", bridge);
 						wrapper.call("initChat()");
 					} catch (Exception e) {
-						System.out.println("なんかのエラー：" + e);
+						throw new IllegalStateException("ウィンドウ初期セットでエラー発生：" + e);
 					}
 
 					//コントローラークラスの初期化

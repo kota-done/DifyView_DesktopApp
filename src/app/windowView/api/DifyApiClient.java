@@ -105,7 +105,7 @@ public class DifyApiClient {
 							//nullでないなら、event.trim()、nullなら空文字を返す。
 							if ("message_end".equals(event != null ? event.trim() : "")) {
 								onComplete.run();
-								System.out.println("チャンクの終了を確認");
+								//System.out.println("チャンクの終了を確認");
 								break;
 							}
 							//チャンクの中身の空白チェック,空白なら例外

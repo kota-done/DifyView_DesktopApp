@@ -1,5 +1,8 @@
 package app.windowView.window;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import app.util.CommonFunction;
 import app.windowView.api.DifyApiClient;
 import app.windowView.api.DifyRequestDto;
@@ -12,6 +15,8 @@ public class WindowController {
 	private final DifyApiClient apiClient;
 	//UI処理スレッドのラッパーオブジェクト
 	private final UiIniWrapper uiRunnable;
+	//ロガーオブジェクト
+	private static final Logger logger = LoggerFactory.getLogger(WindowController.class);
 	
 	/************
 	* メソッド名：引数付きコンストラクタ
@@ -29,7 +34,8 @@ public class WindowController {
 	* @param msg ユーザー入力メッセージ
 	/************/
 	public void onSendMessage(String msg) {
-		
+		// 受付の事実（本文は出さない）
+		logger.info("input.accepted len={}", msg == null ? 0 : msg.length());
 		//リクエストDto生成
 		DifyRequestDto dto = new DifyRequestDto(msg);
 		//API通信用のスレッド作成。通信終了後に破棄。
@@ -41,6 +47,7 @@ public class WindowController {
 		            () -> uiRunnable.runLater(this::onChatComplete)
 		        );
 		    } catch (Exception e) {
+		    	logger.error("API通信ディスパッチ：異常終了",e);
 		    	uiRunnable.runLater(() -> showError(e));
 		    }
 		});
@@ -69,7 +76,8 @@ public class WindowController {
 	* 処理内容：全てのチャンクの受信が完了した旨を表示する処理を呼び出す。
 	/************/
 	private void onChatComplete() {
-		//System.out.println("最終チャンクを認識し、JS呼び出しは可能。");
+		//API通信処理終了。
+		logger.info("API通信ディスパッチ：正常終了");
 		webEngine.call("completeMsg()");
 	}
 }

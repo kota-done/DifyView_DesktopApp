@@ -2,6 +2,9 @@ package app.windowView.window;
 
 import java.util.Properties;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import app.util.CommonFunction;
 import app.windowView.api.DifyApiClient;
 import app.windowView.config.AppSettingDto;
@@ -33,7 +36,9 @@ public class WindowLogic {
 
 	//ブリッジクラスのオブジェクト　ロジックで保持する用
 	private JavaBridge bridge;
-
+	
+	//ロガーオブジェクト。アプリの起動・終了・異常を出力。処理の詳細は各処理で実装。
+	private static final Logger logger = LoggerFactory.getLogger(WindowLogic.class);
 	/**
 	 * ウィンドウ表示を制御する実行メソッド
 	 */
@@ -65,17 +70,13 @@ public class WindowLogic {
 					try {
 						//初期化したUIオブジェクトからラッパーオブジェクトの初期化
 						wrapper = new WebEngineWrapper(webview.getEngine());
-						//JSObject js = (JSObject) webview.getEngine().executeScript("window");
-						//						System.out.println("ブリッジ設定メソッド起動");
-						//js.setMember("JavaBridge", bridge);
-						// JavaScriptの初期化関数を呼び出す（この時点でJavaBridgeは登録済）
-						//js.eval("initChat()");
 						wrapper.registerBridge("JavaBridge", bridge);
 						wrapper.call("initChat()");
+						logger.info("ウィンドウ起動処理：正常起動");
 					} catch (Exception e) {
+						logger.error("初期化セット起動エラー：異常終了",e);
 						throw new IllegalStateException("ウィンドウ初期セットでエラー発生：" + e);
 					}
-
 					//コントローラークラスの初期化
 					windowController = new WindowController(wrapper, apiClient, uiRunnable);
 				}
@@ -86,6 +87,8 @@ public class WindowLogic {
 				 */
 				@Override
 				public void onUserInput(String input) {
+					//ユーザー入力受け付けから、メソッド起動
+					logger.info("API通信ディスパッチ：起動");
 					//API通信処理呼び出し
 					windowController.onSendMessage(input);
 				};
@@ -100,6 +103,7 @@ public class WindowLogic {
 			Application.launch(WindowView.class, setTitle, setWidth, setHeight);
 
 		} catch (Exception e) {
+			logger.error("ロジックエラー：️",e);
 			throw new IllegalStateException("ロジック内で例外発生：" + e);
 		}
 	}

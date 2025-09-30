@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true" scanPeriod="30 seconds" debug="false">
+  <!-- 
+    scan="true" : 設定ファイルの自動リロードを有効化。
+    scanPeriod="30 seconds" : 30秒ごとに変更をチェック。
+    ※ 開発時はログレベルやパターン調整に便利。
+    ※ 本番環境では不要（OFF推奨：scan="false"）。
+  -->
+
+  <!-- 変数 -->
+  <property name="LOG_DIR" value="log"/>
+  <property name="APP_NAME" value="app"/>
+
+  <!-- Console（開発時はON。本番ではOFFを推奨） -->
+  <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <pattern>%d{ISO8601} %-5level [%thread] %logger - %msg %X{requestId}%n</pattern>
+    </encoder>
+  </appender>
+
+  <!-- メイン出力：最新は固定名、日毎＋サイズでローテ（YYYYMMDD） -->
+  <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>${LOG_DIR}/${APP_NAME}.log</file>
+    <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+      <fileNamePattern>${LOG_DIR}/bk/${APP_NAME}.%d{yyyyMMdd}.%i.log</fileNamePattern>
+      <maxFileSize>5MB</maxFileSize>
+      <maxHistory>30</maxHistory>
+      <totalSizeCap>1GB</totalSizeCap>
+    </rollingPolicy>
+    <encoder>
+      <pattern>%d{ISO8601} %-5level [%thread] %logger - %msg %X{requestId}%n</pattern>
+    </encoder>
+  </appender>
+
+  <!-- ERROR専用：最新は固定名、日毎ローテ（YYYYMMDD） -->
+  <appender name="ERROR_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>${LOG_DIR}/error.log</file>
+    <filter class="ch.qos.logback.classic.filter.ThresholdFilter"><level>ERROR</level></filter>
+    <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+      <fileNamePattern>${LOG_DIR}/bk_error/error.%d{yyyyMMdd}.%i.log</fileNamePattern>
+      <maxFileSize>5MB</maxFileSize>
+      <maxHistory>30</maxHistory>
+      <totalSizeCap>1GB</totalSizeCap>
+    </rollingPolicy>
+    <encoder>
+      <pattern>%d{ISO8601} %-5level [%thread] %logger - %msg %X{requestId}%n</pattern>
+    </encoder>
+  </appender>
+
+  <!-- パッケージ別（雛形。必要時に level/appender-ref を追記）
+       API通信詳細ログは不要：処理内容はチャットBot側で確認可能。 -->
+  <logger name="app.windowView"/>
+  <logger name="app.windowView.api"/>
+  <logger name="app.windowView.window"/>
+
+  <!-- ルート：INFO以上を Console + File + Error へ -->
+  <root level="INFO">
+    <appender-ref ref="CONSOLE"/>
+    <appender-ref ref="FILE"/>
+    <appender-ref ref="ERROR_FILE"/>
+  </root>
+</configuration>

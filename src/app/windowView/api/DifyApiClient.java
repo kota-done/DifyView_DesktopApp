@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.function.Consumer;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.gson.Gson;
 
 import app.util.CommonFunction;
@@ -29,6 +32,8 @@ public class DifyApiClient {
 	private final String apiKey;
 	private final OkHttpClient httpClient;
 	private final Gson gson = new Gson();
+	//ロガーオブジェクト
+	private static final Logger logger = LoggerFactory.getLogger(DifyApiClient.class);
 
 	/**
 	*引数付きコンストラクタ
@@ -66,6 +71,7 @@ public class DifyApiClient {
 			//通信失敗時の処理
 			@Override
 			public void onFailure(Call call, IOException e) {
+				logger.error("API通信：URLエラー url={}", difyAPI_URL, e);
 				throw new IllegalStateException("APIエラー:" + e.getMessage());
 			}
 
@@ -74,16 +80,18 @@ public class DifyApiClient {
 			public void onResponse(Call call, Response response) throws IOException {
 				// ステータスコードチェック（200系以外はNG）
 				if (!response.isSuccessful()) {
-					throw new IOException("API通信ステータスエラー；" + response.code());
+					logger.error("API通信：通信ステータスエラー code{}",response.code());
+					throw new IOException("HTTPエラー；" + response.code());
 				}
 				//レスポンスのnullチェック
-				ResponseBody responseBdoy = response.body();
-				if (responseBdoy == null) {
+				ResponseBody responseBody = response.body();
+				if (responseBody == null) {
+					logger.error("API通信：レスポンスnull");
 					throw new IllegalStateException("レスポンスの中身がnullです。");
 				}
 
 				//チャンク毎にレスポンスの受け取り
-				try (BufferedSource source = responseBdoy.source()) {
+				try (BufferedSource source = responseBody.source()) {
 
 					while (!source.exhausted()) {
 						//1行ずつUTF-8形式で格納
@@ -115,6 +123,8 @@ public class DifyApiClient {
 						}
 					}
 				} catch (Exception e2) {
+					//ロガーにエラーログ出力
+					logger.error("API通信：異常終了",e2);
 					//チャンク読み込み中エラー
 					throw new IllegalStateException("チャンク読み込みエラー：" + e2.getMessage());
 				}

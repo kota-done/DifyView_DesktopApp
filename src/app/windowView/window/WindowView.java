@@ -3,6 +3,9 @@ package app.windowView.window;
 import java.net.URL;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javafx.application.Application;
 import javafx.concurrent.Worker;
 import javafx.scene.Scene;
@@ -16,12 +19,18 @@ import window_interface.BridgeCallback;
  * @version 1.0
  */
 public class WindowView extends Application {
-	//
+	//WebViewオブジェクト。ロジッククラスへの戻し用
 	WebView webView = new WebView();
 
-	//
+	//ブリッジのラッパークラスオブジェクト
 	private static BridgeCallback staticCallback;
-
+	
+	//ロガーオブジェクト
+	private final Logger logger = LoggerFactory.getLogger(WindowView.class);
+	
+	//HTMLファイルのパス取得:クラスパス配下
+	private final String ChATWINDOW_PATH = "/resources/window/window_chatBot.html";
+	
 	/************
 	* メソッド名：ウェブオブジェクト取得
 	* 処理内容：ウェブオブジェクトを取り出す。
@@ -83,10 +92,8 @@ public class WindowView extends Application {
 			//整数以外例外
 			throw new IllegalStateException("幅または高さが整数ではありません。:" + e.getMessage());
 		}
-		//HTMLファイルのパス取得
-		String htmlPath = "/resources/window/window_chatBot.html";
-		URL url = getClass().getResource(htmlPath);
-//				System.out.println("取得URL："+url);
+		//ウィンドウ表示HTMLのURL取得
+		URL url = getClass().getResource(ChATWINDOW_PATH);
 
 		//WebEngineの初期化ロードのチェック。ロードが完了してから、ロジッククラスのブリッジセット処理を呼び出す。
 		webView.getEngine().getLoadWorker().stateProperty().addListener((obs, oldState, newState) -> {
@@ -102,7 +109,7 @@ public class WindowView extends Application {
 		});
 
 		if (url == null) {
-			throw new IllegalStateException("HTMLファイルが見つかりません" + htmlPath);
+			throw new IllegalStateException("HTMLファイルが見つかりません" + ChATWINDOW_PATH);
 		} else {
 			webView.getEngine().load(url.toExternalForm());
 
@@ -111,7 +118,6 @@ public class WindowView extends Application {
 			stage.setTitle(title);
 			stage.setScene(scene);
 			stage.show();
-
 		}
 	}
 }

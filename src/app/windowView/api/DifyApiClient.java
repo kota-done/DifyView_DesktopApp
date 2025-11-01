@@ -65,8 +65,7 @@ public class DifyApiClient {
 				.header("Authorization", "Bearer " + apiKey)
 				.post(body)
 				.build();
-		//System.out.println(request);
-		//
+
 		httpClient.newCall(request).enqueue(new Callback() {
 			//通信失敗時の処理
 			@Override

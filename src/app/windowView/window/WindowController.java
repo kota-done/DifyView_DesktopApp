@@ -40,16 +40,17 @@ public class WindowController {
 		DifyRequestDto dto = new DifyRequestDto(msg);
 		//API通信用のスレッド作成。通信終了後に破棄。
 		Thread communicationThread = new Thread(() -> {
-		    try {
+//		    try {
 		        apiClient.streamingMsg(
 		            dto,
 		            chunk -> uiRunnable.runLater(() -> appendChatChunk(chunk)),
-		            () -> uiRunnable.runLater(this::onChatComplete)
+		            () -> uiRunnable.runLater(this::onChatComplete),
+		            err  -> uiRunnable.runLater(() -> showError(err))
 		        );
-		    } catch (Exception e) {
-		    	logger.error("API通信ディスパッチ：異常終了",e);
-		    	uiRunnable.runLater(() -> showError(e));
-		    }
+//		    } catch (Exception e) {
+//		    	logger.error("API通信ディスパッチ：異常終了",e);
+//		    	uiRunnable.runLater(() -> showError(e));
+//		    }
 		});
 		communicationThread.setDaemon(true); // アプリ終了と同時に停止するよう設定
 		communicationThread.start(); // 実行。
@@ -57,10 +58,10 @@ public class WindowController {
 	/************
 	* メソッド名：エラーメッセージ表示
 	* 処理内容：API通信またはUI更新処理内でエラーが発生したらエラーメッセージを表示する処理を呼び出す。
-	* @param e 
+	* @param err 
 	/************/
-	private void showError(Exception e) {
-		String msg = "エラーが発生しました: " + e.getMessage();
+	private void showError(String err) {
+		String msg = "エラーが発生しました: " + err;
 	    webEngine.call("showError(" + CommonFunction.escapeForJS(msg) + ")");
 	}
 	/************

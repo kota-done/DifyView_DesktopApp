@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 
 import app.util.CommonFunction;
 import okhttp3.Call;
@@ -23,9 +24,10 @@ import okio.BufferedSource;
 /**
  * API通信処理実装クラス
  * @author 
- * @version 1.1
+ * @version 1.2
  * 修正：
- * 7/26　最終チャンク前に空文字のチャンクが混入する仕様になっていたため、チェック処理追加。
+ * 2025/7/26　最終チャンク前に空文字のチャンクが混入する仕様になっていたため、チェック処理追加。
+ * 2025/11/3　呼び出し元で例外発生をキャッチできないため、ストリーミング処理固有のエラーレスポンスを実装。
  */
 public class DifyApiClient {
 	private final String difyAPI_URL;
@@ -52,7 +54,11 @@ public class DifyApiClient {
 	* @param onChunk レスポンス成功時に実行するメソッド
 	* @param conComplete レスポンス受信終了時に実行するメソッド
 	*/
-	public void streamingMsg(DifyRequestDto dto, Consumer<String> onChunk, Runnable onComplete) {
+	public void streamingMsg(
+			DifyRequestDto dto, 
+			Consumer<String> onChunk, 
+			Runnable onComplete,
+			Consumer<String> onError) {
 		//リクエストの中身
 		RequestBody body = RequestBody.create(
 				//送信データのメディアタイプををJson形式に設定。引数はテンプレ。
@@ -71,7 +77,9 @@ public class DifyApiClient {
 			@Override
 			public void onFailure(Call call, IOException e) {
 				logger.error("API通信：URLエラー url={}", difyAPI_URL, e);
-				throw new IllegalStateException("APIエラー:" + e.getMessage());
+				//20251102上位にスローできないため廃止
+				//throw new IllegalStateException("APIエラー:" + e.getMessage());
+				onError.accept("AIとの通信に失敗しました。アプリを再起動してください。");
 			}
 
 			//通信が成功して何かしらのレスポンスを受信した時
@@ -80,13 +88,17 @@ public class DifyApiClient {
 				// ステータスコードチェック（200系以外はNG）
 				if (!response.isSuccessful()) {
 					logger.error("API通信：通信ステータスエラー code{}",response.code());
-					throw new IOException("HTTPエラー；" + response.code());
+					//20251102上位にスローできないため廃止
+					//throw new IOException("HTTPエラー；" + response.code());
+					onError.accept("通信エラーが発生しました。時間をおいて再試行してください。");
 				}
 				//レスポンスのnullチェック
 				ResponseBody responseBody = response.body();
 				if (responseBody == null) {
 					logger.error("API通信：レスポンスnull");
-					throw new IllegalStateException("レスポンスの中身がnullです。");
+					//20251102上位にスローできないため廃止
+					//throw new IllegalStateException("レスポンスの中身がnullです。");
+					onError.accept("AIからのレスポンスの中身がないためエラーとなりました。時間をおいて再試行してください。");
 				}
 
 				//チャンク毎にレスポンスの受け取り
@@ -99,6 +111,8 @@ public class DifyApiClient {
 						if (resline != null && resline.startsWith("data:")) {
 
 							String data = resline.substring(6);
+							// レスポンスのJsonオブジェクト
+							JsonObject root = gson.fromJson(data, JsonObject.class);
 
 							DifyResponseDto chunk = gson.fromJson(data, DifyResponseDto.class);
 							//チャンクのawnser取り出し
@@ -107,6 +121,14 @@ public class DifyApiClient {
 							if (answer != null && answer.trim().isEmpty()) {
 								continue;
 							}
+							 // Jsonのエラーコードの有無をチェック。発生している場合、その時点でストリーミング処理中断。
+							if (root == null) continue;
+                            if (root.has("error") || (root.has("code") && root.has("message"))) {
+                                logger.error("API通信：アプリ層エラー payload={}", data);
+                                onError.accept("処理に失敗しました。時間をおいて再試行してください。");
+                                return;
+                            }
+							
 							//受信チャンクのイベントをチェックし、終了イベントなら処理終了。
 							String event = chunk.getEvent();
 							//nullでないなら、event.trim()、nullなら空文字を返す。
@@ -124,8 +146,10 @@ public class DifyApiClient {
 				} catch (Exception e2) {
 					//ロガーにエラーログ出力
 					logger.error("API通信：異常終了",e2);
+					//20251102上位にスローできないため廃止
 					//チャンク読み込み中エラー
-					throw new IllegalStateException("チャンク読み込みエラー：" + e2.getMessage());
+					//throw new IllegalStateException("チャンク読み込みエラー：" + e2.getMessage());
+					onError.accept("AIからのレスポンス処理で問題が発生しました。再度実行してください。");
 				}
 			}
 		});

@@ -58,7 +58,7 @@ public class WindowControllerTest {
 				chunkConsumer.accept("テストチャンク");
 				completeCallback.run();
 				return null;
-			}).when(mockApiClient).streamingMsg(any(), any(), any());
+			}).when(mockApiClient).streamingMsg(any(), any(), any(), any());
 
 			// テスト実行
 			controller.onSendMessage("テストメッセージ");
@@ -116,7 +116,7 @@ public class WindowControllerTest {
 				chunkConsumer.accept("テストチャンク2");
 				completeCallback.run();
 				return null;
-			}).when(mockApiClient).streamingMsg(any(), any(), any());
+			}).when(mockApiClient).streamingMsg(any(), any(), any(), any());
 
 			// テスト実行
 			controller.onSendMessage("テストメッセージ");
@@ -167,7 +167,7 @@ public class WindowControllerTest {
 			}).when(mockUiRunnable).runLater(any());
 
 			// APIモック設定
-			doThrow(new RuntimeException("API通信の失敗")).when(mockApiClient).streamingMsg(any(), any(), any());
+			doThrow(new RuntimeException("API通信の失敗")).when(mockApiClient).streamingMsg(any(), any(), any(), any());
 
 			// テスト実行
 			controller.onSendMessage("テストメッセージ");

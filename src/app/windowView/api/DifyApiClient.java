@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
-import app.util.CommonFunction;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.MediaType;
@@ -28,6 +27,7 @@ import okio.BufferedSource;
  * 修正：
  * 2025/7/26　最終チャンク前に空文字のチャンクが混入する仕様になっていたため、チェック処理追加。
  * 2025/11/3　呼び出し元で例外発生をキャッチできないため、ストリーミング処理固有のエラーレスポンスを実装。
+ * 2025/12/20 event欠落、answerの文字列以外の例外スローを追加。
  */
 public class DifyApiClient {
 	private final String difyAPI_URL;
@@ -51,12 +51,13 @@ public class DifyApiClient {
 	/**
 	*DifyAPIとのストリーミング通信処理
 	* @param dto DifyRequestDtoオブジェクト：リクエスト
-	* @param onChunk レスポンス成功時に実行するメソッド
-	* @param conComplete レスポンス受信終了時に実行するメソッド
+	* @param onChunk レスポンス成功時に実行するメソッド（呼び出し元で詳細を実装）
+	* @param conComplete レスポンス受信終了時に実行するメソッド（呼び出し元で詳細を実装）
+	* @param onError エラーが発生した時に実行するメソッド（呼び出し元で詳細を実装）
 	*/
 	public void streamingMsg(
-			DifyRequestDto dto, 
-			Consumer<String> onChunk, 
+			DifyRequestDto dto,
+			Consumer<String> onChunk,
 			Runnable onComplete,
 			Consumer<String> onError) {
 		//リクエストの中身
@@ -87,10 +88,11 @@ public class DifyApiClient {
 			public void onResponse(Call call, Response response) throws IOException {
 				// ステータスコードチェック（200系以外はNG）
 				if (!response.isSuccessful()) {
-					logger.error("API通信：通信ステータスエラー code{}",response.code());
+					logger.error("API通信：通信ステータスエラー code{}", response.code());
 					//20251102上位にスローできないため廃止
 					//throw new IOException("HTTPエラー；" + response.code());
 					onError.accept("通信エラーが発生しました。時間をおいて再試行してください。");
+					return;
 				}
 				//レスポンスのnullチェック
 				ResponseBody responseBody = response.body();
@@ -99,6 +101,7 @@ public class DifyApiClient {
 					//20251102上位にスローできないため廃止
 					//throw new IllegalStateException("レスポンスの中身がnullです。");
 					onError.accept("AIからのレスポンスの中身がないためエラーとなりました。時間をおいて再試行してください。");
+					return;
 				}
 
 				//チャンク毎にレスポンスの受け取り
@@ -110,42 +113,83 @@ public class DifyApiClient {
 
 						if (resline != null && resline.startsWith("data:")) {
 
-							String data = resline.substring(6);
-							// レスポンスのJsonオブジェクト
+							//5文字以降をtrim
+							String data = resline.substring(5).trim();
+							//20251102 Jsonオブジェクト内のエラーメッセジーをチェック。　start
+							// レスポンスのJsonオブジェクト 
 							JsonObject root = gson.fromJson(data, JsonObject.class);
+							if (root == null) {
+								logger.error("API通信：JSONパース結果がnull。data={}", data);
+								continue; // ← rootがnullなら以降の処理をスキップ
+							}
+							// rootの内容をもとにエラー判定
+							if (root.has("error") || (root.has("code") && root.has("message"))) {
+								logger.error("API通信：アプリ層エラー payload={}", data);
+								onError.accept("処理に失敗しました。時間をおいて再試行してください。");
+								return;
+							}
+							//**20251220 eventの欠落、空白時の除外
+							if (!root.has("event")
+									|| root.get("event").isJsonNull()
+									|| root.get("event").getAsString().trim().isEmpty()) {
 
+								logger.error("API通信：event欠落または空 payload={}", data);
+								onError.accept("AIからのレスポンス形式に異常がでました。再度実行してください。");
+								return;
+							}
+							//20251220 **
+
+							//20251102 Jsonオブジェクト内のエラーメッセジーをチェック。 finish
+							//受信チャンクのイベントをチェックし、終了イベントなら処理終了。
+							//20251220 Dtoオブジェクトへの変換前にチェックすることで、変換部分をスキップ**
+							String event = root.get("event").getAsString().trim();
+							if ("message_end".equals(event)) {
+								onComplete.run();
+								break;
+							}
+							// 20251220**
+							//							String event = chunk.getEvent();
+							//							if ("message_end".equals(event.trim())) {
+							//								onComplete.run();
+							//								break;
+							//							}
+							// message以外はIF違反として落とす（or continueにするならここを変更）
+							if (!"message".equals(event)) {
+								logger.error("API通信：event未知/非対応 event={} payload={}", event, data);
+								onError.accept("AIからのレスポンス形式が不正です。再度実行してください。");
+								return;
+							}
+
+							if ("message".equals(event)) {
+								if (!root.has("answer") || root.get("answer").isJsonNull()) {
+									logger.error("API通信：answer欠落/null payload={}", data);
+									onError.accept("AIからのレスポンス形式が不正です。再度実行してください。");
+									return;
+								}
+								if (!root.get("answer").isJsonPrimitive()
+										|| !root.get("answer").getAsJsonPrimitive().isString()) {
+									logger.error("API通信：answer型不正（string以外） payload={}", data);
+									onError.accept("AIからのレスポンス形式が不正です。再度実行してください。");
+									return;
+								}
+							}
 							DifyResponseDto chunk = gson.fromJson(data, DifyResponseDto.class);
+							if (chunk == null) {
+								logger.error("API通信：DTO変換結果がnull。data={}", data);
+								continue;
+							}
 							//チャンクのawnser取り出し
 							String answer = chunk.getAnswer();
 							//空文字の場合（message_endの一つ手前）、スキップ。 7/26動作確認時点で受信チャンクに混入していたため追加。
 							if (answer != null && answer.trim().isEmpty()) {
 								continue;
 							}
-							 // Jsonのエラーコードの有無をチェック。発生している場合、その時点でストリーミング処理中断。
-							if (root == null) continue;
-                            if (root.has("error") || (root.has("code") && root.has("message"))) {
-                                logger.error("API通信：アプリ層エラー payload={}", data);
-                                onError.accept("処理に失敗しました。時間をおいて再試行してください。");
-                                return;
-                            }
-							
-							//受信チャンクのイベントをチェックし、終了イベントなら処理終了。
-							String event = chunk.getEvent();
-							//nullでないなら、event.trim()、nullなら空文字を返す。
-							if ("message_end".equals(event != null ? event.trim() : "")) {
-								onComplete.run();
-								//System.out.println("チャンクの終了を確認");
-								break;
-							}
-							//チャンクの中身の空白チェック,空白なら例外
-							CommonFunction.checkNullBlank(answer);
-							//メソッド引数のonChunkにセットされているメソッドの呼び出し。
 							onChunk.accept(answer);
 						}
 					}
 				} catch (Exception e2) {
 					//ロガーにエラーログ出力
-					logger.error("API通信：異常終了",e2);
+					logger.error("API通信：異常終了", e2);
 					//20251102上位にスローできないため廃止
 					//チャンク読み込み中エラー
 					//throw new IllegalStateException("チャンク読み込みエラー：" + e2.getMessage());

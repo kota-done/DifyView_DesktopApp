@@ -19,8 +19,6 @@ public class DifyResponseDto {
 	//チャンクのイベント（終了キャッチ用）
 	private String event;
 
-
-
 	//チャットbotが参照したドキュメントの情報を格納するリスト。
 	private List<RetrieverResourceDto> retriever_resources;
 

@@ -9,6 +9,7 @@ import app.util.CommonFunction;
 import app.windowView.api.DifyApiClient;
 import app.windowView.config.AppSettingDto;
 import app.windowView.config.SettingLoader;
+import app.windowView.validation.InputValidator;
 import javafx.application.Application;
 import javafx.scene.web.WebView;
 import window_interface.BridgeCallback;
@@ -36,9 +37,39 @@ public class WindowLogic {
 
 	//ブリッジクラスのオブジェクト　ロジックで保持する用
 	private JavaBridge bridge;
-	
+
+	// 入力バリデータ（Controllerへ注入）
+	private InputValidator inputValidator;
+
 	//ロガーオブジェクト。アプリの起動・終了・異常を出力。処理の詳細は各処理で実装。
 	private static final Logger logger = LoggerFactory.getLogger(WindowLogic.class);
+
+	/**
+	 * WindowController 生成メソッド（テスト用差し替えで追加。）
+	 *
+	 * 本番：
+	 *  - WindowControllerのコンストラクタを呼び出して生成する。
+	 *
+	 * テスト（LT）：
+	 *  - WindowLogic を継承して本メソッドをoverrideし、
+	 *    テスト用 WindowControllerを返却する形を実装。
+	 *    Controller 起動の観測や差し替えを可能とする。
+	 *
+	 * @param wrapper        WebEngine のラッパー（UI 更新呼び出し用）
+	 * @param apiClient      Dify API 通信クラス
+	 * @param uiRunnable     JavaFX UI スレッド実行ラッパー
+	 * @param inputValidator 入力バリデータ（Fail-fast）
+	 * @return 生成されたControllerインスタンス
+	 */
+	protected WindowController createWindowController(
+			WebEngineWrapper wrapper,
+			DifyApiClient apiClient,
+			UiIniWrapper uiRunnable,
+			InputValidator inputValidator) {
+
+		return new WindowController(wrapper, apiClient, uiRunnable, inputValidator);
+	}
+
 	/**
 	 * ウィンドウ表示を制御する実行メソッド
 	 */
@@ -53,11 +84,14 @@ public class WindowLogic {
 			//API通信オブジェクトの初期化
 			apiClient = new DifyApiClient(configDto.getApiUrl(), configDto.getApiKey());
 
+			//入力バリデータの初期化（Controllerへ注入）
+			inputValidator = new InputValidator();
+
 			//コールバックオブジェクトをセット。匿名クラスでコールバック後のブリッジセットメソッド実装。
 			WindowView.setStaticCallback(new BridgeCallback() {
 				/**
 				 * JSオブジェクトにブリッジを登録する
-				 * @param view 登録対象のWebViewオブジェクト（JSオブジェクトを内包している） 
+				 * @param view 登録対象のWebViewオブジェクト（JSオブジェクトを内包している）
 				 */
 				@Override
 				public void onWindowSet(WindowView view) {
@@ -66,6 +100,7 @@ public class WindowLogic {
 
 					// JS Bridge登録
 					bridge = new JavaBridge(this);
+
 					// DOMとJSのロードが完了したタイミングでBridge登録とJS呼び出し
 					try {
 						//初期化したUIオブジェクトからラッパーオブジェクトの初期化
@@ -74,11 +109,12 @@ public class WindowLogic {
 						wrapper.call("initChat()");
 						logger.info("ウィンドウ起動処理：正常起動");
 					} catch (Exception e) {
-						logger.error("初期化セット起動エラー：異常終了",e);
+						logger.error("初期化セット起動エラー：異常終了", e);
 						throw new IllegalStateException("ウィンドウ初期セットでエラー発生：" + e);
 					}
-					//コントローラークラスの初期化
-					windowController = new WindowController(wrapper, apiClient, uiRunnable);
+
+					//コントローラークラスの初期化（テスト用差し替えポイント経由）
+					windowController = createWindowController(wrapper, apiClient, uiRunnable, inputValidator);
 				}
 
 				/**
@@ -91,7 +127,7 @@ public class WindowLogic {
 					logger.info("API通信ディスパッチ：起動");
 					//API通信処理呼び出し
 					windowController.onSendMessage(input);
-				};
+				}
 			});
 
 			//WindowViewに設定値Dtoを渡すための変数を用意
@@ -103,7 +139,7 @@ public class WindowLogic {
 			Application.launch(WindowView.class, setTitle, setWidth, setHeight);
 
 		} catch (Exception e) {
-			logger.error("ロジックエラー：️",e);
+			logger.error("ロジックエラー：️", e);
 			throw new IllegalStateException("ロジック内で例外発生：" + e);
 		}
 	}

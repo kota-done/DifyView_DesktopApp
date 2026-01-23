@@ -12,6 +12,7 @@ import java.util.function.Consumer;
 import org.junit.Test;
 
 import app.windowView.api.DifyApiClient;
+import app.windowView.validation.InputValidator;
 import app.windowView.window.UiIniWrapper;
 import app.windowView.window.WebEngineWrapper;
 import app.windowView.window.WindowController;
@@ -23,8 +24,10 @@ public class WindowControllerTest {
 	DifyApiClient mockApiClient = mock(DifyApiClient.class);
 	//UI処理用のモック
 	UiIniWrapper mockUiRunnable = mock(UiIniWrapper.class);
+	//バリデーション
+	InputValidator validate = new InputValidator();
 	// モックのcontroller
-	WindowController controller = new WindowController(mockEngine, mockApiClient, mockUiRunnable);
+	WindowController controller = new WindowController(mockEngine, mockApiClient, mockUiRunnable, validate);
 
 	/**
 	 *テストパターン　正常系　onSendMessage処理から正しくappendChatChunkおよびonChatCompleteが呼び出される。 
@@ -66,9 +69,10 @@ public class WindowControllerTest {
 			// 処理完了まで待機（最大2秒）
 			boolean completed = latch.await(2, TimeUnit.SECONDS);
 			assertTrue("非同期処理が2秒以内に完了しませんでした", completed);
+			
 
 			// JavaScript呼び出しの確認（）
-			verify(mockEngine).call(eq("appendMsg(テストチャンク)"));
+			verify(mockEngine).call(eq("appendMsg(\"テストチャンク\")"));
 			verify(mockEngine).call(eq("completeMsg()"));
 
 			out.println(resultOutput + "が正常終了しました。");
@@ -126,8 +130,8 @@ public class WindowControllerTest {
 			assertTrue("非同期処理が2秒以内に完了しませんでした", completed);
 
 			// JavaScript呼び出しの確認（）
-			verify(mockEngine).call(eq("appendMsg(テストチャンク1)"));
-			verify(mockEngine).call(eq("appendMsg(テストチャンク2)"));
+			verify(mockEngine).call(eq("appendMsg(\"テストチャンク1\")"));
+			verify(mockEngine).call(eq("appendMsg(\"テストチャンク2\")"));
 			verify(mockEngine).call(eq("completeMsg()"));
 
 			out.println(resultOutput + "が正常終了しました。");
@@ -176,7 +180,8 @@ public class WindowControllerTest {
 			boolean completed = latch.await(2, TimeUnit.SECONDS);
 			assertTrue("非同期処理が2秒以内に完了しませんでした", completed);
 			// JavaScript呼び出しの確認（）
-			verify(mockEngine).call(eq("showError(エラーが発生しました: API通信の失敗)"));
+			verify(mockEngine).call(contains("showError("));
+			verify(mockEngine).call(contains("通信処理でエラーが発生しました。"));
 
 			out.println(resultOutput + "が正常終了しました。");
 

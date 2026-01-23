@@ -3,9 +3,6 @@ package app.windowView.window;
 import java.net.URL;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import javafx.application.Application;
 import javafx.concurrent.Worker;
 import javafx.scene.Scene;
@@ -20,13 +17,13 @@ import window_interface.BridgeCallback;
  */
 public class WindowView extends Application {
 	//WebViewオブジェクト。ロジッククラスへの戻し用
-	WebView webView = new WebView();
+	private final WebView webView = new WebView();
 
 	//ブリッジのラッパークラスオブジェクト
 	private static BridgeCallback staticCallback;
 	
 	//ロガーオブジェクト
-	private final Logger logger = LoggerFactory.getLogger(WindowView.class);
+	//private final Logger logger = LoggerFactory.getLogger(WindowView.class);
 	
 	//HTMLファイルのパス取得:クラスパス配下
 	private final String ChATWINDOW_PATH = "/resources/window/window_chatBot.html";

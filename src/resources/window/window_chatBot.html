@@ -113,13 +113,15 @@
 
     // メッセージ送信処理
     function sendMessage() {
-	 //appendMsg("sendMessageを呼び出しました。");
       //入力メッセージチェック
-      const message = input.value.trim();
-      if (!message) return;
+	  const message = input.value.trim();
+	  if (!message) {
+		alert("入力してください");
+	    //showError("リクエストを入力してください。");
+	    return;
+	  }
       //ボタン非活性化
       sendButton.disabled = true;
-  
 
       // --- ユーザーメッセージの表示 ---
       const userWrapper = document.createElement("div");
@@ -129,7 +131,6 @@
       userMsg.textContent = message;
       userWrapper.appendChild(userMsg);
       chatArea.appendChild(userWrapper);
-
 
       if (window.JavaBridge && typeof window.JavaBridge.sendToJava === "function") {
         try {

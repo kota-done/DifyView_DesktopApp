@@ -14,6 +14,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import app.windowView.api.DifyApiClient;
+import app.windowView.validation.InputValidator;
 import app.windowView.window.UiIniWrapper;
 import app.windowView.window.WebEngineWrapper;
 import app.windowView.window.WindowController;
@@ -95,7 +96,7 @@ public class LinkTest_T1_WindowController {
 		String apiUrl = server.url("/").toString(); // フルURLにPOST
 		DifyApiClient apiClient = new DifyApiClient(apiUrl, "dummy-key");
 
-		WindowController controller = new WindowController(webEngine, apiClient, ui);
+		WindowController controller = new WindowController(webEngine, apiClient, ui, new InputValidator());
 
 		// 実行
 		controller.onSendMessage("hi");
@@ -176,7 +177,7 @@ public class LinkTest_T1_WindowController {
 		String apiUrl = server.url("/").toString(); // フルURLへPOST
 		DifyApiClient apiClient = new DifyApiClient(apiUrl, "dummy-key");
 
-		WindowController controller = new WindowController(webEngine, apiClient, ui);
+		WindowController controller = new WindowController(webEngine, apiClient, ui, new InputValidator());
 
 		// 実行
 		controller.onSendMessage("start");
@@ -247,7 +248,7 @@ public class LinkTest_T1_WindowController {
 		String apiUrl = server.url("/").toString(); // フルURLへPOST
 		DifyApiClient apiClient = new DifyApiClient(apiUrl, "dummy-key");
 
-		WindowController controller = new WindowController(webEngine, apiClient, ui);
+		WindowController controller = new WindowController(webEngine, apiClient, ui, new InputValidator());
 
 		// 実行
 		controller.onSendMessage("start");
@@ -318,7 +319,7 @@ public class LinkTest_T1_WindowController {
 		String apiUrl = server.url("/").toString(); // フルURLへPOST
 		DifyApiClient apiClient = new DifyApiClient(apiUrl, "dummy-key");
 
-		WindowController controller = new WindowController(webEngine, apiClient, ui);
+		WindowController controller = new WindowController(webEngine, apiClient, ui, new InputValidator());
 
 		// 実行
 		controller.onSendMessage("start");
@@ -388,7 +389,7 @@ public class LinkTest_T1_WindowController {
 		String apiUrl = server.url("/chat").toString();
 		DifyApiClient apiClient = new DifyApiClient(apiUrl, "dummy-key");
 
-		WindowController controller = new WindowController(webEngine, apiClient, ui);
+		WindowController controller = new WindowController(webEngine, apiClient, ui, new InputValidator());
 
 		// 実行
 		controller.onSendMessage("start");
@@ -466,7 +467,7 @@ public class LinkTest_T1_WindowController {
 		String apiUrl = server.url("/chat").toString();
 		DifyApiClient apiClient = new DifyApiClient(apiUrl, "dummy-key");
 
-		WindowController controller = new WindowController(webEngine, apiClient, ui);
+		WindowController controller = new WindowController(webEngine, apiClient, ui, new InputValidator());
 
 		// 実行
 		controller.onSendMessage("start");

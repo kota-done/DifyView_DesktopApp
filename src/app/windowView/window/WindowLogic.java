@@ -45,15 +45,7 @@ public class WindowLogic {
 	private static final Logger logger = LoggerFactory.getLogger(WindowLogic.class);
 
 	/**
-	 * WindowController 生成メソッド（テスト用差し替えで追加。）
-	 *
-	 * 本番：
-	 *  - WindowControllerのコンストラクタを呼び出して生成する。
-	 *
-	 * テスト（LT）：
-	 *  - WindowLogic を継承して本メソッドをoverrideし、
-	 *    テスト用 WindowControllerを返却する形を実装。
-	 *    Controller 起動の観測や差し替えを可能とする。
+	 * WindowController 生成メソッド
 	 *
 	 * @param wrapper        WebEngine のラッパー（UI 更新呼び出し用）
 	 * @param apiClient      Dify API 通信クラス
@@ -113,7 +105,7 @@ public class WindowLogic {
 						throw new IllegalStateException("ウィンドウ初期セットでエラー発生：" + e);
 					}
 
-					//コントローラークラスの初期化（テスト用差し替えポイント経由）
+					//コントローラークラスの初期化
 					windowController = createWindowController(wrapper, apiClient, uiRunnable, inputValidator);
 				}
 

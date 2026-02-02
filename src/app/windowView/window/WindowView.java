@@ -42,23 +42,14 @@ public class WindowView extends Application {
 	}
 
 	/************
-	* メソッド名：ウェブオブジェクト取得
-	* 処理内容：ウェブオブジェクトを取り出す。
-	* @return webView 表示したウィンドウの表示内容をもつオブジェクト
+	* メソッド名：ウェブオブジェクト設定
+	* 処理内容：Logicクラスが生成した匿名コールバックオブエクトをブリッジクラスのラッパークラスにセットする。
+	* @param callBack Logicクラスが生成した匿名クラスオブジェクト
+	* @return void
 	/************/
 	public static void setStaticCallback(BridgeCallback callback) {
 		staticCallback = callback;
 	}
-	//	
-	//	/************
-	//	* メソッド名：設定ファイルDtoセットメソッド
-	//	* 処理内容：ロジッククラス経由で設定ファイルDtoを受け取る。
-	//	/************/
-	//	public void setDto(AppSettingDto dto,JavaBridge bridge,BridgeCallback bc) {
-	//		this.dto = dto;
-	//		this.bridge = bridge;
-	//		this.bridgeCall = bc;
-	//	}
 
 	/************
 	* メソッド名：ウィンドウ表示処理

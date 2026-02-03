@@ -26,7 +26,7 @@ public class LinkTest_T2_BridgeToController {
 	 *  - 追加の呼び出しは発生しない（verifyNoMoreInteractions）
 	 */
 	@Test
-	public void LTN1_bridge_to_onSendMessage() {
+	public void LT_N1_bridge_to_onSendMessage() {
 		// Controllerは「呼ばれた事実」だけ観測するのでモック化
 		WindowController controller = mock(WindowController.class);
 

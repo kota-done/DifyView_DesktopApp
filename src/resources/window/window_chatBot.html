@@ -6,69 +6,156 @@
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
   <title>チャットUI</title>
   <style>
+    :root {
+      --bg: #f6f7fb;
+      --panel: #ffffff;
+      --text: #1b1f2a;
+      --muted: #6b7280;
+      --border: #e6e9f1;
+      --shadow: 0 10px 30px rgba(20, 25, 40, 0.08);
+      --user: #d7ebff;
+      --bot: #e8f7ef;
+      --user-strong: #2a5bd7;
+      --bot-strong: #1f7a4f;
+      --warn: #d97706;
+      --ok: #15803d;
+      --ng: #b91c1c;
+    }
+
+    * { box-sizing: border-box; }
+
     body {
-      font-family: sans-serif;
+      font-family: "Noto Sans JP", "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
       margin: 0;
       padding: 0;
-      height: 100vh;
-      width: 100vw;
+      min-height: 100vh;
+      background: radial-gradient(1200px 600px at 10% 0%, #eef5ff 0%, var(--bg) 45%, #f9fafb 100%);
+      color: var(--text);
+    }
+
+    .app {
+      max-width: 920px;
+      margin: 0 auto;
+      min-height: 100vh;
       display: flex;
       flex-direction: column;
+      padding: 18px 16px 20px;
+      gap: 12px;
+    }
+
+    header {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      border-radius: 14px;
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    header .title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+
+    .status {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.9rem;
+      color: var(--muted);
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: #fafbff;
+    }
+
+    .status .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      background: var(--muted);
+      box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.03);
+    }
+
+    .status[data-state="connected"] .dot {
+      background: var(--ok);
+      box-shadow: 0 0 0 3px rgba(21, 128, 61, 0.15);
+    }
+
+    .status[data-state="sending"] .dot {
+      background: var(--warn);
+      box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.15);
+    }
+
+    .status[data-state="disconnected"] .dot {
+      background: var(--ng);
+      box-shadow: 0 0 0 3px rgba(185, 28, 28, 0.15);
     }
 
     #chat-area {
       flex: 1;
-      padding: 10px;
+      padding: 16px;
       overflow-y: auto;
-      background: #f0f0f0;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      box-shadow: var(--shadow);
       display: flex;
       flex-direction: column;
+      gap: 10px;
+      min-height: 50vh;
     }
 
-    .chat-wrapper {
-      display: flex;
-      margin: 5px 0;
-    }
+    .chat-wrapper { display: flex; }
 
-    .chat-wrapper.user {
-      justify-content: flex-end;
-    }
-
-    .chat-wrapper.bot {
-      justify-content: flex-start;
-    }
+    .chat-wrapper.user { justify-content: flex-end; }
+    .chat-wrapper.bot  { justify-content: flex-start; }
 
     .message {
       display: inline-block;
-      max-width: 75%;
+      max-width: 78%;
       background: #eee;
-      padding: 8px 12px;
-      border-radius: 10px;
+      padding: 10px 14px;
+      border-radius: 14px;
       word-break: break-word;
       white-space: pre-wrap;
+      line-height: 1.6;
+      box-shadow: 0 6px 18px rgba(20, 25, 40, 0.08);
+      border: 1px solid rgba(0, 0, 0, 0.03);
     }
 
     .message.user {
-      background: #cce5ff;
+      background: var(--user);
+      color: #0b2c4d;
+      border-color: rgba(42, 91, 215, 0.15);
       text-align: right;
     }
 
     .message.bot {
-      background: #d4edda;
+      background: var(--bot);
+      color: #0f2f20;
+      border-color: rgba(31, 122, 79, 0.15);
       text-align: left;
     }
 
     #input-area {
       display: flex;
-      padding: 10px;
-      background: #ddd;
+      padding: 12px;
+      background: var(--panel);
       width: 100%;
-      box-sizing: border-box;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      box-shadow: var(--shadow);
+      gap: 8px;
     }
 
     #user-input {
       flex: 1;
-      padding: 8px;
+      padding: 10px 12px;
       font-size: 1em;
       resize: none;
       min-height: 2em;
@@ -79,32 +166,89 @@
       word-break: break-word;
       width: 100%;
       max-width: 100%;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: #fbfcff;
     }
 
     #input-area button {
-      padding: 8px 16px;
+      padding: 10px 18px;
       font-size: 1em;
-      margin-left: 5px;
+      border-radius: 10px;
+      border: 1px solid #cfd6e6;
+      background: #1f3b6b;
+      color: #ffffff;
+      cursor: pointer;
+      transition: transform 0.06s ease, opacity 0.2s ease;
+    }
+
+    #input-area button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    #input-area button:active:not(:disabled) {
+      transform: translateY(1px);
+    }
+
+    @media (max-width: 680px) {
+      .app { padding: 12px 10px 14px; }
+      header { flex-direction: column; align-items: flex-start; }
+      .message { max-width: 88%; }
     }
   </style>
 </head>
 
 <body>
-  <div id="chat-area">
-    <div class="chat-wrapper bot">
-      <div class="message bot">こんにちは！ご用件をどうぞ。</div>
+  <div class="app">
+    <header>
+      <div class="title" id="app-title">カスタマイズBot</div>
+      <div class="status" id="status-indicator" data-state="disconnected">
+        <span class="dot"></span>
+        <span id="status-text">接続不可</span>
+      </div>
+    </header>
+
+    <div id="chat-area">
+      <div class="chat-wrapper bot">
+        <div class="message bot">こんにちは！ご用件をどうぞ。</div>
+      </div>
+    </div>
+
+    <div id="input-area">
+      <textarea id="user-input" placeholder="メッセージを入力..."></textarea>
+      <button onclick="sendMessage()">送信</button>
     </div>
   </div>
-  <div id="input-area">
-    <textarea id="user-input" placeholder="メッセージを入力..."></textarea>
-    <button onclick="sendMessage()">送信</button>
-  </div>
 
-    <script>
+  <script>
     const input = document.getElementById("user-input");
     const chatArea = document.getElementById("chat-area");
-    //送信ボタン宣言
     const sendButton = document.querySelector("#input-area button");
+    const statusIndicator = document.getElementById("status-indicator");
+    const statusText = document.getElementById("status-text");
+
+    function setStatus(state, label) {
+      statusIndicator.dataset.state = state;
+      statusText.textContent = label;
+    }
+
+    let shouldAutoScroll = true;
+    const autoScrollThreshold = 120;
+
+    function updateAutoScrollFlag() {
+      const distanceFromBottom = chatArea.scrollHeight - chatArea.scrollTop - chatArea.clientHeight;
+      shouldAutoScroll = distanceFromBottom <= autoScrollThreshold;
+    }
+
+    chatArea.addEventListener("scroll", updateAutoScrollFlag);
+
+    function scrollToBottomIfAllowed() {
+      if (shouldAutoScroll) {
+        chatArea.scrollTop = chatArea.scrollHeight;
+      }
+    }
 
     input.addEventListener("input", () => {
       input.style.height = "auto";
@@ -113,17 +257,18 @@
 
     // メッセージ送信処理
     function sendMessage() {
-      //入力メッセージチェック
-	  const message = input.value.trim();
-	  if (!message) {
-		alert("入力してください");
-	    //showError("リクエストを入力してください。");
-	    return;
-	  }
-      //ボタン非活性化
-      sendButton.disabled = true;
+      // ✅「空白チェック」だけ trim() を使う（送信文字列自体は生入力を尊重）
+      const raw = input.value;
+      if (!raw.trim()) {
+        alert("入力してください");
+        return;
+      }
+      const message = raw;
 
-      // --- ユーザーメッセージの表示 ---
+      sendButton.disabled = true;
+      setStatus("sending", "送信中");
+
+      // ユーザーメッセージの表示
       const userWrapper = document.createElement("div");
       userWrapper.className = "chat-wrapper user";
       const userMsg = document.createElement("div");
@@ -131,62 +276,61 @@
       userMsg.textContent = message;
       userWrapper.appendChild(userMsg);
       chatArea.appendChild(userWrapper);
+      scrollToBottomIfAllowed();
 
       if (window.JavaBridge && typeof window.JavaBridge.sendToJava === "function") {
         try {
-		  //appendMsg("ブリッジクラスのsendToJavaを呼び出し処理実行。");
           window.JavaBridge.sendToJava(message);
         } catch (e) {
-         showError("メッセージ送信中にエラーが発生しました。"+ e.message);
-          console.error("Error in onUserInput:", e); 
+          // ✅ showError がボタン復帰も担う
+          showError("メッセージ送信中にエラーが発生しました。" + e.message);
+          console.error("Error in onUserInput:", e);
         }
-      }else {
+      } else {
         showError("JavaBridgeが正しく設定されていません。");
       }
+
       input.value = "";
       input.style.height = "auto";
-      chatArea.scrollTop = chatArea.scrollHeight;
+      scrollToBottomIfAllowed();
     }
 
+    // Java側からチャンク追記（未完了なら同一バブルへ追記）
+    window.appendMsg = function (chunk) {
+      let botMsgs = chatArea.querySelectorAll(".chat-wrapper.bot .message.bot");
+      let lastBotMsg = botMsgs[botMsgs.length - 1];
 
-    // Java側からチャンク追記される　最初は新しいメッセージとして追記
-  window.appendMsg=function(chunk) {
+      if (!lastBotMsg || lastBotMsg.classList.contains("complete")) {
+        const botWrapper = document.createElement("div");
+        botWrapper.className = "chat-wrapper bot";
 
-  let botMsgs = chatArea.querySelectorAll(".chat-wrapper.bot .message.bot");
-  let lastBotMsg = botMsgs[botMsgs.length - 1];
+        lastBotMsg = document.createElement("div");
+        lastBotMsg.className = "message bot";
+        lastBotMsg.textContent = chunk;
 
-  // メッセージ欄が存在しない or complete なら新規作成
-  if (!lastBotMsg || lastBotMsg.classList.contains("complete")) {
-    const botWrapper = document.createElement("div");
-    botWrapper.className = "chat-wrapper bot";
+        botWrapper.appendChild(lastBotMsg);
+        chatArea.appendChild(botWrapper);
+      } else {
+        lastBotMsg.textContent += chunk;
+      }
 
-    lastBotMsg = document.createElement("div");
-    lastBotMsg.className = "message bot";
-    lastBotMsg.textContent = chunk;
-
-    botWrapper.appendChild(lastBotMsg);
-    chatArea.appendChild(botWrapper);
-  } else {
-    lastBotMsg.textContent += chunk;
-  }
-
-  chatArea.scrollTop = chatArea.scrollHeight;
-}
+      scrollToBottomIfAllowed();
+    }
 
     // チャット完了処理：完了マーク追記＋固定化
     function completeMsg() {
       const botMsgs = chatArea.querySelectorAll(".chat-wrapper.bot .message.bot");
       const lastBotMsg = botMsgs[botMsgs.length - 1];
       if (lastBotMsg && !lastBotMsg.classList.contains("complete")) {
-        lastBotMsg.textContent += "\n\n--- 質問が可能です。 ---";
+        //lastBotMsg.textContent += "\n\n--- 質問が可能です。 ---";
         lastBotMsg.classList.add("complete");
       }
-      chatArea.scrollTop = chatArea.scrollHeight;
-      // ボタン活性化
+      scrollToBottomIfAllowed();
       sendButton.disabled = false;
+      setStatus("connected", "接続可");
     }
 
-    // エラー表示処理
+    // エラー表示処理（UI復帰もここが担当）
     function showError(msg) {
       const botWrapper = document.createElement("div");
       botWrapper.className = "chat-wrapper bot";
@@ -195,18 +339,24 @@
       botMsg.textContent = msg;
       botWrapper.appendChild(botMsg);
       chatArea.appendChild(botWrapper);
-      chatArea.scrollTop = chatArea.scrollHeight;
+      scrollToBottomIfAllowed();
+      setStatus("disconnected", "接続不可");
+      sendButton.disabled = false;
     }
 
     function initChat() {
-  if (window.JavaBridge && typeof window.JavaBridge.sendToJava === "function") {
-    // 例えば初回の案内メッセージを表示するなど
-	//appendMsg(typeof appendMsg);
-    completeMsg();
-  } else {
-    showError("JavaBridgeが正しく設定されていません。");
-  }
-}
+      if (window.JavaBridge && typeof window.JavaBridge.sendToJava === "function") {
+        completeMsg();
+        setStatus("connected", "接続可");
+      } else {
+        showError("JavaBridgeが正しく設定されていません。");
+      }
+    }
+
+    // ✅ Java側から確実に呼べるよう、window へ明示的に公開（接続契約を堅くする）
+    window.completeMsg = completeMsg;
+    window.showError = showError;
+    window.initChat = initChat;
   </script>
 </body>
 

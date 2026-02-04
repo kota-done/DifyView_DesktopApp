@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>エスケープ文字列テスト</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    .message { background:white; margin: 5px 0; padding: 6px; border-radius: 4px; white-space: pre-wrap; }
+  </style>
+</head>
+<body>
+
+  <h2>JS側での文字列解釈テスト</h2>
+  <div id="chatArea"></div>
+
+  <script>
+    const chatArea = document.getElementById("chatArea");
+
+    function appendMsg(chunk) {
+      const msg = document.createElement("div");
+      msg.className = "message";
+      msg.textContent = chunk;
+      chatArea.appendChild(msg);
+    }
+    function showError(msg, error) {
+      const chatArea = document.getElementById("chatArea");
+      const errDiv = document.createElement("div");
+      errDiv.className = "message error";
+      errDiv.textContent = `[ERROR] ${msg}\n${error.message}`;
+      chatArea.appendChild(errDiv);
+    }
+
+    // Javaの escapeForJS によって加工された文字列リスト（Java側からコピー貼り付け）
+    const escapedStrings = [
+      "abc",
+      "a\"b\"c",
+      "a\'b\'c",
+      "a\r\nb",
+      "a\tb",
+      "line1\nline2",
+      "\\\\test",
+      "こんにちは？",
+    ];
+
+    escapedStrings.forEach((str, index) => {
+      try {
+        appendMsg(`パターン${index + 1}: ${str}`);
+      } catch (e) {
+        showError(`パターン${index + 1}でエラー`, e);
+      }
+    });
+  </script>
+</body>
+</html>

@@ -26,7 +26,7 @@ public class WindowView extends Application {
 	//private final Logger logger = LoggerFactory.getLogger(WindowView.class);
 	
 	//HTMLファイルのパス取得:クラスパス配下
-	private final String ChATWINDOW_PATH = "/resources/window/window_chatBot.html";
+	private final String ChATWINDOW_PATH = "/window_chatBot.html";
 	
 	/************
 	* メソッド名：ウェブオブジェクト取得

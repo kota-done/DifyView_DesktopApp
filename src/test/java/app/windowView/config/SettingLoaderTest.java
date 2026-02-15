@@ -12,8 +12,6 @@ import java.util.Properties;
 import org.junit.Test;
 
 import app.util.CommonFunction;
-import app.windowView.config.AppSettingDto;
-import app.windowView.config.SettingLoader;
 
 /**
  * 
@@ -29,7 +27,7 @@ public class SettingLoaderTest {
 	private void setUp() {
 		try {
 			//正常系のみで使用する。
-			testProps = CommonFunction.load("/resources/app.properties");
+			testProps = CommonFunction.load("/app_test.properties");
 		} catch (IOException e) {
 			fail("設定ファイルの読み込みに失敗しました: " + e.getMessage());
 		}

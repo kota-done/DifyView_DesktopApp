@@ -1,8 +1,6 @@
-package app;
+package app.util;
 
 import java.net.URL;
-
-import app.util.CommonFunction;
 
 public class ClassPathTest {
 
@@ -18,7 +16,7 @@ public class ClassPathTest {
 //	        ClassLoader classLoader = ClassPathTest.class.getClassLoader();
 //	        System.out.println("リソース 'app.properties' のURL: " +
 //	            classLoader.getResource("resources/app.properties"));
-	    	URL resourceUrl = CommonFunction.class.getResource("/resources/app.properties");
+	    	URL resourceUrl = CommonFunction.class.getResource("/app.properties");
 	    	System.out.println("Resource URL: " + resourceUrl);
 //	    	InputStream test = CommonFunctionTest.class.getResourceAsStream("/resources/app.properties");
 //	    	System.out.println("testresult:"+test);

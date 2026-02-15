@@ -166,7 +166,7 @@ public class CommonFunctionTest {
 		String className = new Object() {
 		}.getClass().getName();
 		String resultOutput = className + "のloadメソッドのテストパターン2";
-		String testFile = "/resources/app.properties";
+		String testFile = "/app_test.properties";
 		try {
 			out.println("**********************************************");
 			out.println(resultOutput + "が開始されました。");

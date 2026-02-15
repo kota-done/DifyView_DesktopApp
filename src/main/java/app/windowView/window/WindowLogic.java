@@ -25,7 +25,7 @@ import javafx.application.Application;
  */
 public class WindowLogic {
 	//設定ファイルパス（固定）
-	private final static String PROPS_PATH = "/resources/app.properties";
+	private final static String PROPS_PATH = "/app.properties";
 
 	//プロパティオブジェクト
 	private Properties props = null;

@@ -5,7 +5,7 @@ import static java.lang.System.*;
 import app.windowView.window.WindowView;
 import javafx.application.Application;
 
-public class WindowViewTest {
+public class WindowViewLaunch {
 
 	public static void main(String[] args) {
 		String className = new Object() {

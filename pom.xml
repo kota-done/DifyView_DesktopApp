@@ -9,6 +9,8 @@
   <url>https://github.com/kota-done/DifyView_DesktopApp.git</url>
   <properties>
   <maven.compiler.release>21</maven.compiler.release>
+  <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
   <javafx.version>21.0.7</javafx.version>
   <okhttp.version>4.12.0</okhttp.version>

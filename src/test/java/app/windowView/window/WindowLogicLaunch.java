@@ -1,8 +1,6 @@
 package app.windowView.window;
 
-import app.windowView.window.WindowLogic;
-
-public class WindowLogicTest {
+public class WindowLogicLaunch {
 	
 	public static void main(String arugs[]) {
 		WindowLogic logic = new WindowLogic();

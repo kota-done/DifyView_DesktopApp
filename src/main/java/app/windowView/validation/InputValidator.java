@@ -1,5 +1,12 @@
 package app.windowView.validation;
 
+
+/**
+* ユーザー入力のバリデーションクラス
+* @author 
+* @version 1.0
+* 修正：
+*/
 public class InputValidator {
 
 	// 最大長 3000
